@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1370 1330" width="1370" height="1330">
+<defs><marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3d4752"/></marker><marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d9e75"/></marker><marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e07a1f"/></marker><marker id="arrow-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a94a3"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a6fdb"/></marker></defs>
+<rect width="1370" height="1330" fill="#ffffff"/>
+<text x="30" y="40" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" fill="#1f2933" font-weight="bold" text-anchor="start">Data flow - "send Rs 150 from alice@okaxis to bob@oksbi"</text>
+<text x="30" y="63" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">One X-Request-ID travels through every hop below; `python scripts/demo.py trace &lt;id&gt;` prints exactly this path from the logs.</text>
+<rect x="20" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#8a94a3" stroke-width="1.8"/>
+<text x="90" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#8a94a3" font-weight="bold" text-anchor="middle">Mobile app</text>
+<line x1="90" y1="128" x2="90" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="215" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#2a6fdb" stroke-width="1.8"/>
+<text x="285" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#2a6fdb" font-weight="bold" text-anchor="middle">API Gateway</text>
+<line x1="285" y1="128" x2="285" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="410" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#5f6b7a" stroke-width="1.8"/>
+<text x="480" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5f6b7a" font-weight="bold" text-anchor="middle">Payment svc</text>
+<line x1="480" y1="128" x2="480" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="605" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#d1453b" stroke-width="1.8"/>
+<text x="675" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#d1453b" font-weight="bold" text-anchor="middle">Redis</text>
+<line x1="675" y1="128" x2="675" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="800" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#336791" stroke-width="1.8"/>
+<text x="870" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#336791" font-weight="bold" text-anchor="middle">PostgreSQL</text>
+<line x1="870" y1="128" x2="870" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="995" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#1d9e75" stroke-width="1.8"/>
+<text x="1065" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1d9e75" font-weight="bold" text-anchor="middle">Worker</text>
+<line x1="1065" y1="128" x2="1065" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="1195" y="92" width="140" height="36" rx="8" fill="#ffffff" stroke="#b7791f" stroke-width="1.8"/>
+<text x="1265" y="115" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#b7791f" font-weight="bold" text-anchor="middle">NPCI mock</text>
+<line x1="1265" y1="128" x2="1265" y2="1174" stroke="#d5dae1" stroke-width="1.5" stroke-dasharray="4 4"/>
+<rect x="20" y="154" width="1330" height="26" fill="#2a6fdb" opacity="0.10" rx="5"/>
+<text x="32" y="172" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#2a6fdb" font-weight="bold" text-anchor="start">SYNCHRONOUS - the user waits only for this part (~10 ms)</text>
+<path d="M90,208 H279" fill="none" stroke="#2a6fdb" stroke-width="1.7" marker-end="url(#arrow-blue)"/>
+<rect x="99" y="190" width="176" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="187.5" y="201" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">1.  POST /api/v1/payments</text>
+<text x="187.5" y="225" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">Idempotency-Key, X-Client-ID</text>
+<path d="M285,260 H669" fill="none" stroke="#e07a1f" stroke-width="1.7" marker-end="url(#arrow-orange)"/>
+<rect x="335" y="242" width="290" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="480.0" y="253" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">2.  EVALSHA token bucket (client + global)</text>
+<text x="480.0" y="277" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">no token -&gt; 429 + Retry-After, request ends here</text>
+<path d="M285,312 H474" fill="none" stroke="#2a6fdb" stroke-width="1.7" marker-end="url(#arrow-blue)"/>
+<rect x="291" y="294" width="183" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="382.5" y="305" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">3.  forward + X-Request-ID</text>
+<text x="382.5" y="329" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">round robin, breaker</text>
+<path d="M480,364 H669" fill="none" stroke="#3d4752" stroke-width="1.7" marker-end="url(#arrow-ink)"/>
+<rect x="483" y="346" width="189" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="577.5" y="357" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">4.  GET cache:vpa:bob@oksbi</text>
+<text x="577.5" y="381" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">payee name (miss -&gt; SELECT, SET 5 min)</text>
+<path d="M480,416 H864" fill="none" stroke="#336791" stroke-width="1.7" marker-end="url(#arrow-ink)"/>
+<rect x="510" y="398" width="331" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="675.0" y="409" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">5.  INSERT txn ... ON CONFLICT (idempotency_key)</text>
+<text x="675.0" y="433" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">status PENDING + audit event</text>
+<path d="M480,468 H669" fill="none" stroke="#1d9e75" stroke-width="1.7" marker-end="url(#arrow-green)"/>
+<rect x="479" y="450" width="196" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="577.5" y="461" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">6.  XADD upi:payments:stream</text>
+<text x="577.5" y="485" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">{txn_id, request_id, enqueued_at}</text>
+<path d="M480,520 H291" fill="none" stroke="#2a6fdb" stroke-width="1.7" stroke-dasharray="5 4" marker-end="url(#arrow-blue)"/>
+<rect x="325" y="502" width="116" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="382.5" y="513" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">7.  202 Accepted</text>
+<path d="M285,562 H96" fill="none" stroke="#2a6fdb" stroke-width="1.7" stroke-dasharray="5 4" marker-end="url(#arrow-blue)"/>
+<rect x="99" y="544" width="176" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="187.5" y="555" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">8.  202 {txn_id, PENDING}</text>
+<text x="187.5" y="579" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">the bank has not been called yet</text>
+<rect x="20" y="600" width="1330" height="26" fill="#1d9e75" opacity="0.10" rx="5"/>
+<text x="32" y="618" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1d9e75" font-weight="bold" text-anchor="start">ASYNCHRONOUS - worker pool, decoupled from the request</text>
+<path d="M1065,654 H681" fill="none" stroke="#1d9e75" stroke-width="1.7" marker-end="url(#arrow-green)"/>
+<rect x="758" y="636" width="223" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="870.0" y="647" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">9.  XREADGROUP payment-workers &gt;</text>
+<text x="870.0" y="671" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">Redis hands each message to one consumer</text>
+<path d="M1065,706 H876" fill="none" stroke="#336791" stroke-width="1.7" marker-end="url(#arrow-ink)"/>
+<rect x="910" y="688" width="116" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="967.5" y="699" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">10.  CLAIM lease</text>
+<text x="967.5" y="723" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">PENDING -&gt; PROCESSING (duplicates: 0 rows)</text>
+<path d="M1065,758 H1259" fill="none" stroke="#b7791f" stroke-width="1.7" marker-end="url(#arrow-orange)"/>
+<rect x="1077" y="740" width="176" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="1165.0" y="751" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">11.  POST /npci/authorize</text>
+<text x="1165.0" y="775" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">retry 0.2s/0.4s/0.8s + breaker</text>
+<path d="M1265,810 H1071" fill="none" stroke="#b7791f" stroke-width="1.7" stroke-dasharray="5 4" marker-end="url(#arrow-orange)"/>
+<rect x="1084" y="792" width="163" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="1165.0" y="803" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">12.  APPROVED, bank_ref</text>
+<path d="M1065,852 H876" fill="none" stroke="#336791" stroke-width="1.7" marker-end="url(#arrow-ink)"/>
+<rect x="863" y="834" width="210" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="967.5" y="845" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">13.  settle in ONE transaction</text>
+<text x="967.5" y="869" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">lock rows, debit, credit, ledger x2, SUCCESS, COMMIT</text>
+<path d="M1065,904 H681" fill="none" stroke="#1d9e75" stroke-width="1.7" marker-end="url(#arrow-green)"/>
+<rect x="779" y="886" width="183" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="870.0" y="897" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">14.  XACK + DEL cache keys</text>
+<text x="870.0" y="921" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">balance / txn / history of both parties</text>
+<rect x="20" y="942" width="1330" height="26" fill="#2a6fdb" opacity="0.10" rx="5"/>
+<text x="32" y="960" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#2a6fdb" font-weight="bold" text-anchor="start">CLIENT POLLS STATUS</text>
+<path d="M90,996 H279" fill="none" stroke="#2a6fdb" stroke-width="1.7" marker-end="url(#arrow-blue)"/>
+<rect x="93" y="978" width="189" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="187.5" y="989" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">15.  GET /payments/{txn_id}</text>
+<path d="M285,1038 H474" fill="none" stroke="#2a6fdb" stroke-width="1.7" marker-end="url(#arrow-blue)"/>
+<rect x="338" y="1020" width="89" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="382.5" y="1031" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">16.  forward</text>
+<path d="M480,1080 H669" fill="none" stroke="#3d4752" stroke-width="1.7" marker-end="url(#arrow-ink)"/>
+<rect x="496" y="1062" width="163" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="577.5" y="1073" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">17.  GET cache:txn:{id}</text>
+<text x="577.5" y="1097" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">miss -&gt; SELECT; final status cached 5 min</text>
+<path d="M480,1132 H96" fill="none" stroke="#2a6fdb" stroke-width="1.7" stroke-dasharray="5 4" marker-end="url(#arrow-blue)"/>
+<rect x="160" y="1114" width="250" height="17" fill="#ffffff" opacity="0.92" rx="3"/><text x="285.0" y="1125" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="middle">18.  200 {status: SUCCESS, bank_ref}</text>
+<text x="285.0" y="1149" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">via the gateway, X-Cache: HIT or MISS</text>
+<rect x="30" y="1194" width="1310" height="112" rx="8" fill="#fff8f6" stroke="#d1453b" stroke-width="1.2"/>
+<text x="46" y="1218" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#d1453b" font-weight="bold" text-anchor="start">When step 11 fails</text>
+<text x="46" y="1242" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2933" font-weight="normal" text-anchor="start">• Bank 5xx/timeout -&gt; retried in-process with exponential backoff (equal jitter). 5 consecutive failures open the circuit breaker: calls fail fast for 10 s, then one trial call.</text>
+<text x="46" y="1263" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2933" font-weight="normal" text-anchor="start">• Still failing / breaker open -&gt; txn back to PENDING and the message is NOT acknowledged; it stays in the Pending Entries List and XAUTOCLAIM re-delivers it after 15 s.</text>
+<text x="46" y="1284" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2933" font-weight="normal" text-anchor="start">• After 3 delivery attempts (or 120 s) -&gt; FAILED + copy to upi:payments:dlq. Worker crash mid-way -&gt; lease expires, another worker re-claims. Money moves at most once.</text>
+</svg>

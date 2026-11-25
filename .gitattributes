@@ -1,0 +1,5 @@
+# Keep LF line endings in the repo even when cloned on Windows, so files
+# copied into Linux containers behave the same everywhere.
+* text=auto eol=lf
+*.png binary
+*.svg text eol=lf

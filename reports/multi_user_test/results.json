@@ -1,0 +1,401 @@
+{
+  "generated_at": "2026-11-25 15:59:32",
+  "gateway": "http://127.0.0.1:8080",
+  "seed": 42,
+  "duration_s": 72.8,
+  "distinct_payers": 228,
+  "distinct_people": 232,
+  "total_cases": 259,
+  "total_passed": 259,
+  "all_ok": true,
+  "phases": [
+    {
+      "name": "P2P transfer",
+      "cases": 100,
+      "passed": 100,
+      "outcomes": {
+        "SUCCESS": 100
+      },
+      "settle_p50_s": 0.74,
+      "settle_p95_s": 1.56,
+      "note": "27.2 payments/s end-to-end"
+    },
+    {
+      "name": "P2M merchant payment",
+      "cases": 30,
+      "passed": 30,
+      "outcomes": {
+        "SUCCESS": 30
+      },
+      "settle_p50_s": 0.81,
+      "settle_p95_s": 1.03,
+      "note": ""
+    },
+    {
+      "name": "Concurrent payments to one payee",
+      "cases": 20,
+      "passed": 20,
+      "outcomes": {
+        "SUCCESS": 20
+      },
+      "settle_p50_s": 0.68,
+      "settle_p95_s": 0.78,
+      "note": ""
+    },
+    {
+      "name": "Concurrent overspend",
+      "cases": 3,
+      "passed": 3,
+      "outcomes": {
+        "SUCCESS": 2,
+        "FAILED": 1
+      },
+      "settle_p50_s": 0.38,
+      "settle_p95_s": 0.38,
+      "note": "2 SUCCESS / 1 INSUFFICIENT_FUNDS"
+    },
+    {
+      "name": "Double tap (idempotent replay)",
+      "cases": 10,
+      "passed": 10,
+      "outcomes": {
+        "SUCCESS": 10
+      },
+      "settle_p50_s": 0.37,
+      "settle_p95_s": 0.38,
+      "note": ""
+    },
+    {
+      "name": "Idempotency key reused",
+      "cases": 5,
+      "passed": 5,
+      "outcomes": {
+        "SUCCESS": 5
+      },
+      "settle_p50_s": 0.48,
+      "settle_p95_s": 0.49,
+      "note": ""
+    },
+    {
+      "name": "Bank decline",
+      "cases": 10,
+      "passed": 10,
+      "outcomes": {
+        "FAILED": 10
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Insufficient funds",
+      "cases": 1,
+      "passed": 1,
+      "outcomes": {
+        "FAILED": 1
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Amount above Rs 1 lakh",
+      "cases": 4,
+      "passed": 4,
+      "outcomes": {
+        "HTTP 422 AMOUNT_LIMIT_EXCEEDED": 4
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Pay yourself",
+      "cases": 4,
+      "passed": 4,
+      "outcomes": {
+        "HTTP 422 SAME_PAYER_PAYEE": 4
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Unknown payee",
+      "cases": 4,
+      "passed": 4,
+      "outcomes": {
+        "HTTP 404 PAYEE_VPA_NOT_FOUND": 4
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Malformed VPA",
+      "cases": 4,
+      "passed": 4,
+      "outcomes": {
+        "HTTP 422 VALIDATION_ERROR": 4
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Missing Idempotency-Key",
+      "cases": 4,
+      "passed": 4,
+      "outcomes": {
+        "HTTP 400 MISSING_IDEMPOTENCY_KEY": 4
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": ""
+    },
+    {
+      "name": "Rate limit (one user floods 30 requests)",
+      "cases": 30,
+      "passed": 30,
+      "outcomes": {
+        "HTTP 202": 10,
+        "HTTP 429": 20
+      },
+      "settle_p50_s": null,
+      "settle_p95_s": null,
+      "note": "bystander payment SUCCESS"
+    },
+    {
+      "name": "Bank flaky (50% errors)",
+      "cases": 20,
+      "passed": 20,
+      "outcomes": {
+        "SUCCESS": 20
+      },
+      "settle_p50_s": 0.47,
+      "settle_p95_s": 21.69,
+      "note": "19 bank retries"
+    },
+    {
+      "name": "Bank down, then recovers",
+      "cases": 10,
+      "passed": 10,
+      "outcomes": {
+        "SUCCESS": 10
+      },
+      "settle_p50_s": 33.85,
+      "settle_p95_s": 33.88,
+      "note": "breaker opened 2x"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Total money in the system unchanged",
+      "ok": true,
+      "detail": "Rs 1000100000.00 -> Rs 1000100000.00"
+    },
+    {
+      "name": "Every one of 233 tracked accounts moved by exactly its SUCCESS payments",
+      "ok": true,
+      "detail": "all match"
+    },
+    {
+      "name": "No negative balances",
+      "ok": true,
+      "detail": "0 negative"
+    },
+    {
+      "name": "No payment left PENDING/PROCESSING",
+      "ok": true,
+      "detail": "0 stuck"
+    },
+    {
+      "name": "Every double tap returned the original transaction (one debit)",
+      "ok": true,
+      "detail": "10 double taps"
+    }
+  ],
+  "money_before": {
+    "by_status": {
+      "SUCCESS": {
+        "count": 3616,
+        "amount_paise": 155745598
+      },
+      "FAILED": {
+        "count": 52,
+        "amount_paise": 15752318
+      }
+    },
+    "total_transactions": 3668,
+    "money_in_system_paise": 100010000000,
+    "money_in_system": "1000100000.00",
+    "accounts": 1003,
+    "as_of": "2026-11-25T10:28:20+00:00"
+  },
+  "money_after": {
+    "by_status": {
+      "SUCCESS": {
+        "count": 3824,
+        "amount_paise": 191501503
+      },
+      "FAILED": {
+        "count": 64,
+        "amount_paise": 18112447
+      }
+    },
+    "total_transactions": 3888,
+    "money_in_system_paise": 100010000000,
+    "money_in_system": "1000100000.00",
+    "accounts": 1003,
+    "as_of": "2026-11-25T10:29:30+00:00"
+  },
+  "counters_delta": {
+    "gw_rate_limited_total": 20.0,
+    "payments_idempotent_replay_total": 10.0,
+    "bank_retries_total": 34.0,
+    "circuit_opened_total": 2.0,
+    "payments_deferred_total": 21.0,
+    "payments_processed_total{reason=\"DECLINED_BY_REMITTER_BANK\",status=\"FAILED\"}": 10.0,
+    "payments_processed_total{reason=\"INSUFFICIENT_FUNDS\",status=\"FAILED\"}": 2.0,
+    "payments_processed_total{reason=\"OK\",status=\"SUCCESS\"}": 208.0
+  },
+  "chaos": {
+    "flaky_retries": 19.0,
+    "breaker_opened": 2.0,
+    "breakers_while_down": {
+      "worker-1": "OPEN",
+      "worker-2": "OPEN"
+    }
+  },
+  "samples": {
+    "P2P transfer": {
+      "request_id": "d187a9390fb3496d",
+      "txn_id": "ec07418f-e8b3-469e-b535-40c20f796b38",
+      "payer": "user0001@mockbank",
+      "payee": "user0083@mockbank",
+      "amount": "593.69",
+      "final": "SUCCESS"
+    },
+    "P2M merchant payment": {
+      "request_id": "67414d1e5dc14426",
+      "txn_id": "3c9d9e34-d2f0-47f5-ad44-004883b8dc0b",
+      "payer": "user0101@mockbank",
+      "payee": "chaipoint@okicici",
+      "amount": "89.73",
+      "final": "SUCCESS"
+    },
+    "Concurrent payments to one payee": {
+      "request_id": "529d7f8c46ee4bac",
+      "txn_id": "8c0dd22d-55aa-478d-84dd-5729bc287c26",
+      "payer": "user0131@mockbank",
+      "payee": "alice@okaxis",
+      "amount": "395.81",
+      "final": "SUCCESS"
+    },
+    "Concurrent overspend": {
+      "request_id": "2d334d9142384c5a",
+      "txn_id": "b3906047-fead-4eed-8368-e58bb97676ca",
+      "payer": "bob@oksbi",
+      "payee": "user0227@mockbank",
+      "amount": "898.00",
+      "final": "SUCCESS"
+    },
+    "Double tap (idempotent replay)": {
+      "request_id": "1aeed662d2ca426c",
+      "txn_id": "26a2379c-e387-4d7f-96e5-c082d65cd860",
+      "payer": "user0151@mockbank",
+      "payee": "user0076@mockbank",
+      "amount": "2914.14",
+      "final": "SUCCESS"
+    },
+    "Idempotency key reused": {
+      "request_id": "f786056903524521",
+      "txn_id": "e659b269-3fe6-4240-ac84-2bc410d9d1ce",
+      "payer": "user0161@mockbank",
+      "payee": "user0063@mockbank",
+      "amount": "1133.21",
+      "final": "SUCCESS"
+    },
+    "Bank decline": {
+      "request_id": "99a4a355d33d48c2",
+      "txn_id": "dbbdb3ff-9efa-4850-bbfc-ed5efdf657c9",
+      "payer": "user0166@mockbank",
+      "payee": "user0061@mockbank",
+      "amount": "827.13",
+      "final": "FAILED"
+    },
+    "Insufficient funds": {
+      "request_id": "cb17ff60ea7e4a23",
+      "txn_id": "5168614a-a932-4e00-a7e6-ed139ed16868",
+      "payer": "chaipoint@okicici",
+      "payee": "alice@okaxis",
+      "amount": "18984.99",
+      "final": "FAILED"
+    },
+    "Amount above Rs 1 lakh": {
+      "request_id": "6e03c1db09084d0e",
+      "txn_id": null,
+      "payer": "user0176@mockbank",
+      "payee": "user0094@mockbank",
+      "amount": "150000.00",
+      "final": "AMOUNT_LIMIT_EXCEEDED"
+    },
+    "Pay yourself": {
+      "request_id": "31036ec387e94f1e",
+      "txn_id": null,
+      "payer": "user0180@mockbank",
+      "payee": "user0180@mockbank",
+      "amount": "10.00",
+      "final": "SAME_PAYER_PAYEE"
+    },
+    "Unknown payee": {
+      "request_id": "1cdd955cbd994b7e",
+      "txn_id": null,
+      "payer": "user0184@mockbank",
+      "payee": "ghost4139@okhdfc",
+      "amount": "10.00",
+      "final": "PAYEE_VPA_NOT_FOUND"
+    },
+    "Malformed VPA": {
+      "request_id": "8b97b3e327774f57",
+      "txn_id": null,
+      "payer": "user0188@mockbank",
+      "payee": "not-a-vpa",
+      "amount": "10.00",
+      "final": "VALIDATION_ERROR"
+    },
+    "Missing Idempotency-Key": {
+      "request_id": "8d27d958a9d14779",
+      "txn_id": null,
+      "payer": "user0192@mockbank",
+      "payee": "user0018@mockbank",
+      "amount": "10.00",
+      "final": "MISSING_IDEMPOTENCY_KEY"
+    },
+    "Rate limit: bystander unaffected": {
+      "request_id": "6f7cc67b8e3e4295",
+      "txn_id": "eaa30666-e96f-450f-b98d-444486ce5ab9",
+      "payer": "user0002@mockbank",
+      "payee": "user0003@mockbank",
+      "amount": "5.00",
+      "final": "SUCCESS"
+    },
+    "Bank flaky (50% errors)": {
+      "request_id": "72c0cc906ae94548",
+      "txn_id": "26051997-9212-4401-9160-774dce78c84d",
+      "payer": "user0197@mockbank",
+      "payee": "user0060@mockbank",
+      "amount": "1319.70",
+      "final": "SUCCESS"
+    },
+    "Bank down, then recovers": {
+      "request_id": "fd055e92f9234e6c",
+      "txn_id": "1b6e08dc-b03f-4a8e-9cb0-21f5a58af390",
+      "payer": "user0217@mockbank",
+      "payee": "user0038@mockbank",
+      "amount": "1151.37",
+      "final": "SUCCESS"
+    }
+  },
+  "mismatches": []
+}

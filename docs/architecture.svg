@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 880" width="1400" height="880">
+<defs><marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3d4752"/></marker><marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d9e75"/></marker><marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e07a1f"/></marker><marker id="arrow-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a94a3"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a6fdb"/></marker></defs>
+<rect width="1400" height="880" fill="#ffffff"/>
+<text x="30" y="42" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#1f2933" font-weight="bold" text-anchor="start">UPI Payment System - Architecture</text>
+<text x="30" y="66" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5f6b7a" font-weight="normal" text-anchor="start">docker compose: 1 gateway · 2 payment nodes · 1 account node · 2 worker nodes · mock NPCI switch · PostgreSQL · Redis</text>
+<rect x="30" y="140" width="180" height="80" rx="10" fill="#ffffff" stroke="#8a94a3" stroke-width="1.5"/>
+<text x="120" y="172" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2933" font-weight="bold" text-anchor="middle">UPI mobile app</text>
+<text x="120" y="192" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">X-Client-ID: phone id</text>
+<text x="120" y="208" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">Idempotency-Key</text>
+<rect x="30" y="260" width="180" height="70" rx="10" fill="#ffffff" stroke="#8a94a3" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="120" y="290" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2933" font-weight="bold" text-anchor="middle">Locust load test</text>
+<text x="120" y="310" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">steady · spike · chaos</text>
+<rect x="270" y="110" width="300" height="390" rx="10" fill="#eef3fd" stroke="#2a6fdb" stroke-width="2"/>
+<text x="420.0" y="140" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#2a6fdb" font-weight="bold" text-anchor="middle">API Gateway  :8080</text>
+<text x="420.0" y="158" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">the only public entry point</text>
+<circle cx="296" cy="188" r="9" fill="#2a6fdb"/>
+<text x="296" y="192" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
+<text x="314" y="192" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">assign X-Request-ID (trace id)</text>
+<circle cx="296" cy="216" r="9" fill="#2a6fdb"/>
+<text x="296" y="220" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
+<text x="314" y="220" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">route match: longest prefix</text>
+<circle cx="296" cy="244" r="9" fill="#2a6fdb"/>
+<text x="296" y="248" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">3</text>
+<text x="314" y="248" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e07a1f" font-weight="normal" text-anchor="start">token bucket rate limit -&gt; 429</text>
+<text x="314" y="276" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">per-client + global, atomic in Redis</text>
+<circle cx="296" cy="296" r="9" fill="#2a6fdb"/>
+<text x="296" y="300" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">4</text>
+<text x="314" y="300" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">inspect: 400 / 405 / 413 / 415</text>
+<circle cx="296" cy="324" r="9" fill="#2a6fdb"/>
+<text x="296" y="328" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">5</text>
+<text x="314" y="328" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">round robin over healthy nodes</text>
+<circle cx="296" cy="352" r="9" fill="#2a6fdb"/>
+<text x="296" y="356" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">6</text>
+<text x="314" y="356" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d1453b" font-weight="normal" text-anchor="start">circuit breaker per node</text>
+<circle cx="296" cy="380" r="9" fill="#2a6fdb"/>
+<text x="296" y="384" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">7</text>
+<text x="314" y="384" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">proxy; retry other node if safe</text>
+<circle cx="296" cy="408" r="9" fill="#2a6fdb"/>
+<text x="296" y="412" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#ffffff" font-weight="bold" text-anchor="middle">8</text>
+<text x="314" y="412" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="normal" text-anchor="start">JSON log line + metrics</text>
+<line x1="286" y1="448" x2="554" y2="448" stroke="#c9d6f2"/>
+<text x="420.0" y="472" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#2a6fdb" font-weight="normal" text-anchor="middle">GET /health   /metrics   /stats</text>
+<text x="420.0" y="489" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">health monitor polls every node every 3 s</text>
+<rect x="650" y="110" width="230" height="68" rx="10" fill="#f5f6f8" stroke="#5f6b7a" stroke-width="1.5"/>
+<text x="664" y="137" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2933" font-weight="bold" text-anchor="start">payment-service-1</text>
+<text x="664" y="159" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">POST /payments -&gt; 202</text>
+<rect x="650" y="192" width="230" height="68" rx="10" fill="#f5f6f8" stroke="#5f6b7a" stroke-width="1.5"/>
+<text x="664" y="219" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2933" font-weight="bold" text-anchor="start">payment-service-2</text>
+<text x="664" y="241" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">GET /payments/{id}</text>
+<text x="872" y="270" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="end" font-style="italic">stateless replicas</text>
+<rect x="650" y="300" width="230" height="92" rx="10" fill="#f5f6f8" stroke="#5f6b7a" stroke-width="1.5"/>
+<text x="664" y="327" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2933" font-weight="bold" text-anchor="start">account-service</text>
+<text x="664" y="348" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="10.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">GET /vpa/{vpa}</text>
+<text x="664" y="363" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="10.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">GET /accounts/{vpa}/balance</text>
+<text x="664" y="378" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="10.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">GET /accounts/{vpa}/transactions</text>
+<rect x="970" y="110" width="400" height="282" rx="10" fill="#fdeeee" stroke="#d1453b" stroke-width="2"/>
+<text x="986" y="138" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#d1453b" font-weight="bold" text-anchor="start">Redis 7</text>
+<text x="1354" y="138" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="end">AOF on · volatile-lru</text>
+<rect x="984" y="162" width="372" height="52" rx="7" fill="#ffffff" stroke="#e07a1f" stroke-width="1.2"/>
+<text x="996" y="183" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e07a1f" font-weight="bold" text-anchor="start">Rate-limit buckets</text>
+<text x="996" y="202" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">rl:client:&lt;policy&gt;:&lt;id&gt;   rl:global   (TTL)</text>
+<rect x="984" y="224" width="372" height="52" rx="7" fill="#ffffff" stroke="#2a6fdb" stroke-width="1.2"/>
+<text x="996" y="245" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#2a6fdb" font-weight="bold" text-anchor="start">Cache-aside (TTL)</text>
+<text x="996" y="264" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">cache:vpa 5m · cache:balance 30s · cache:txn</text>
+<rect x="984" y="286" width="372" height="62" rx="7" fill="#ffffff" stroke="#1d9e75" stroke-width="1.2"/>
+<text x="996" y="307" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1d9e75" font-weight="bold" text-anchor="start">Queue: Redis Stream</text>
+<text x="996" y="326" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">upi:payments:stream -&gt; group payment-workers</text>
+<text x="996" y="342" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">PEL + XAUTOCLAIM re-delivery · upi:payments:dlq</text>
+<rect x="970" y="560" width="400" height="250" rx="10" fill="#eaf1f9" stroke="#336791" stroke-width="2"/>
+<text x="986" y="588" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#336791" font-weight="bold" text-anchor="start">PostgreSQL 16</text>
+<text x="1354" y="588" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="end">source of truth</text>
+<text x="990" y="620" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">users</text>
+<text x="1138" y="620" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">who</text>
+<text x="990" y="650" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">bank_accounts</text>
+<text x="1138" y="650" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">balance_paise  CHECK &gt;= 0</text>
+<text x="990" y="680" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">vpas</text>
+<text x="1138" y="680" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">alice@okaxis -&gt; account</text>
+<text x="990" y="710" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">transactions</text>
+<text x="1138" y="710" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">UNIQUE idempotency_key · lease</text>
+<text x="990" y="740" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">ledger_entries</text>
+<text x="1138" y="740" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">double entry: 1 debit + 1 credit</text>
+<text x="990" y="770" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="12.5" fill="#1f2933" font-weight="bold" text-anchor="start">transaction_events</text>
+<text x="1138" y="770" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start">audit log of every status change</text>
+<text x="990" y="796" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start" font-style="italic">migrations: db/migrations/*.sql (migrate container)</text>
+<rect x="650" y="560" width="230" height="250" rx="10" fill="#e9f7f1" stroke="#1d9e75" stroke-width="2"/>
+<text x="765.0" y="586" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1d9e75" font-weight="bold" text-anchor="middle">Worker pool</text>
+<text x="765.0" y="604" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">consumer group: payment-workers</text>
+<rect x="664" y="618" width="202" height="54" rx="7" fill="#ffffff" stroke="#1d9e75" stroke-width="1.2"/>
+<text x="676" y="640" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f2933" font-weight="bold" text-anchor="start">worker-1</text>
+<text x="676" y="659" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">8 consumers + reclaimer</text>
+<rect x="664" y="682" width="202" height="54" rx="7" fill="#ffffff" stroke="#1d9e75" stroke-width="1.2"/>
+<text x="676" y="704" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f2933" font-weight="bold" text-anchor="start">worker-2</text>
+<text x="676" y="723" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="start">8 consumers + reclaimer</text>
+<text x="668" y="765" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#1f2933" font-weight="normal" text-anchor="start">• retry + exponential backoff</text>
+<text x="668" y="781" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#1f2933" font-weight="normal" text-anchor="start">• circuit breaker (npci-switch)</text>
+<text x="668" y="797" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#1f2933" font-weight="normal" text-anchor="start">• lease claim -&gt; exactly-once effect</text>
+<rect x="300" y="600" width="240" height="150" rx="10" fill="#fff5e1" stroke="#b7791f" stroke-width="2"/>
+<text x="420.0" y="628" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#b7791f" font-weight="bold" text-anchor="middle">Mock NPCI switch / bank</text>
+<text x="420.0" y="650" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">POST /npci/authorize</text>
+<text x="420.0" y="674" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2933" font-weight="normal" text-anchor="middle">20-60 ms latency, 1% errors</text>
+<text x="420.0" y="694" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#d1453b" font-weight="normal" text-anchor="middle">chaos: flaky · slow · down</text>
+<text x="420.0" y="714" font-family="'JetBrains Mono', Consolas, 'Courier New', monospace" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">POST :8090/admin/chaos</text>
+<text x="420.0" y="734" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5f6b7a" font-weight="normal" text-anchor="middle">amount ending .13 -&gt; DECLINED</text>
+<path d="M210,180 H268" fill="none" stroke="#2a6fdb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+<rect x="222" y="162" width="34" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="239" y="172" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#2a6fdb" font-weight="normal" text-anchor="middle">HTTP</text>
+<path d="M210,295 H268" fill="none" stroke="#2a6fdb" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-blue)"/>
+<path d="M570,144 H648" fill="none" stroke="#3d4752" stroke-width="1.6" marker-end="url(#arrow-ink)"/>
+<path d="M570,226 H648" fill="none" stroke="#3d4752" stroke-width="1.6" marker-end="url(#arrow-ink)"/>
+<path d="M570,346 H648" fill="none" stroke="#3d4752" stroke-width="1.6" marker-end="url(#arrow-ink)"/>
+<rect x="570" y="126" width="79" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="609" y="136" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">round robin</text>
+<rect x="589" y="328" width="40" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="609" y="338" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="middle">proxy</text>
+<path d="M420,110 V88 H1120 V108" fill="none" stroke="#e07a1f" stroke-width="1.8" marker-end="url(#arrow-orange)"/>
+<rect x="553" y="82" width="433" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="770" y="92" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#e07a1f" font-weight="normal" text-anchor="middle">EVALSHA token_bucket.lua (client + global bucket, one atomic step)</text>
+<path d="M880,330 L968,228" fill="none" stroke="#2a6fdb" stroke-width="1.6" marker-end="url(#arrow-blue)"/>
+<rect x="878" y="268" width="53" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="905" y="278" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#2a6fdb" font-weight="normal" text-anchor="middle">GET/SET</text>
+<path d="M880,160 C925,160 925,300 968,300" fill="none" stroke="#1d9e75" stroke-width="2" marker-end="url(#arrow-green)"/>
+<rect x="911" y="194" width="34" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="928" y="205" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1d9e75" font-weight="normal" text-anchor="middle">XADD</text>
+<path d="M880,250 H935 V600 H968" fill="none" stroke="#336791" stroke-width="1.6" marker-end="url(#arrow-ink)"/>
+<path d="M880,380 H935" fill="none" stroke="#336791" stroke-width="1.6" marker-end="url(#arrow-ink)"/>
+<rect x="921" y="510" width="27" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="935" y="520" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#336791" font-weight="normal" text-anchor="middle">SQL</text>
+<path d="M800,560 V470 H1210 V394" fill="none" stroke="#1d9e75" stroke-width="2" marker-end="url(#arrow-green)" marker-start="url(#arrow-green)"/>
+<text x="948" y="492" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1d9e75" font-weight="normal" text-anchor="start">XREADGROUP · XACK · XAUTOCLAIM · DEL cache keys</text>
+<path d="M880,700 H968" fill="none" stroke="#336791" stroke-width="2" marker-end="url(#arrow-ink)"/>
+<rect x="901" y="682" width="47" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="924" y="692" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#336791" font-weight="normal" text-anchor="middle">settle</text>
+<text x="924" y="720" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#336791" font-weight="normal" text-anchor="middle">1 txn</text>
+<path d="M650,675 H542" fill="none" stroke="#b7791f" stroke-width="2" marker-end="url(#arrow-orange)"/>
+<rect x="563" y="656" width="66" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="596" y="667" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#b7791f" font-weight="normal" text-anchor="middle">authorize</text>
+<path d="M330,500 V520 H420 V598" fill="none" stroke="#8a94a3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-grey)"/>
+<path d="M510,500 V530 H720 V558" fill="none" stroke="#8a94a3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow-grey)"/>
+<rect x="576" y="534" width="79" height="16" fill="#ffffff" opacity="0.92" rx="3"/><text x="615" y="545" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#6b7684" font-weight="normal" text-anchor="middle">GET /health</text>
+<rect x="30" y="600" width="240" height="210" rx="8" fill="#ffffff" stroke="#d5dae1" stroke-width="1"/>
+<text x="44" y="624" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#1f2933" font-weight="bold" text-anchor="start">Legend</text>
+<line x1="44" y1="646" x2="82" y2="646" stroke="#2a6fdb" stroke-width="2"/>
+<text x="92" y="650" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="start">synchronous request path</text>
+<line x1="44" y1="672" x2="82" y2="672" stroke="#1d9e75" stroke-width="2"/>
+<text x="92" y="676" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="start">asynchronous path (queue)</text>
+<line x1="44" y1="698" x2="82" y2="698" stroke="#e07a1f" stroke-width="2"/>
+<text x="92" y="702" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="start">rate limiting (token bucket)</text>
+<line x1="44" y1="724" x2="82" y2="724" stroke="#336791" stroke-width="2"/>
+<text x="92" y="728" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="start">database access</text>
+<line x1="44" y1="750" x2="82" y2="750" stroke="#8a94a3" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="92" y="754" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" font-weight="normal" text-anchor="start">health checks (every 3 s)</text>
+<text x="44" y="792" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5f6b7a" font-weight="normal" text-anchor="start" font-style="italic">only :8080 is public</text>
+</svg>

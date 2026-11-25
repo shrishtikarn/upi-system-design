@@ -1,0 +1,122 @@
+﻿[
+    {
+        "key":  "p1_compose_up",
+        "file":  "../submission_screens/p1_compose_up.png",
+        "caption":  "`docker compose up` starts the gateway, 2 payment nodes, account service, 2 workers, bank mock, PostgreSQL and Redis - every container healthy",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p1_health_cli",
+        "file":  "../submission_screens/p1_health_cli.png",
+        "caption":  "Health check endpoint: the gateway polls each node\u0027s /health and reports status, circuit breaker, and queue depth per node",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p1_health_json",
+        "file":  "../submission_screens/p1_health_json.png",
+        "caption":  "GET /health (JSON): overall status UP / DEGRADED / DOWN, rate-limiter backend and per-node details",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p1_routes",
+        "file":  "../submission_screens/p1_routes.png",
+        "caption":  "Gateway routing table: /api/v1/payments -\u003e payment-service (2 nodes, round robin), /api/v1/accounts and /api/v1/vpa -\u003e account-service",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p1_burst",
+        "file":  "../submission_screens/p1_burst.png",
+        "caption":  "Token-bucket rate limiter: one client floods 80 requests; requests pass while its bucket has tokens (burst 40, refilling 20/s), the rest get 429 Too Many Requests with Retry-After, while another client is unaffected",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p1_smoke",
+        "file":  "../submission_screens/p1_smoke.png",
+        "caption":  "End-to-end smoke test: health, routing, cache HIT, async payment, idempotency, 400 without Idempotency-Key, bank decline, 404 route, 429 burst, /stats - all 11 checks pass",
+        "section":  "phase1"
+    },
+    {
+        "key":  "p2_tables",
+        "file":  "../submission_screens/p2_tables.png",
+        "caption":  "Database tables created by the migration scripts (db/migrations/001-003)",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_txn_table",
+        "file":  "../submission_screens/p2_txn_table.png",
+        "caption":  "Schema of the transactions table: unique idempotency_key, status enum, lease columns, request_id for tracing, CHECK payer \u003c\u003e payee",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_migrations",
+        "file":  "../submission_screens/p2_migrations.png",
+        "caption":  "Migration runner: every SQL file applied once and recorded in schema_migrations",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_data",
+        "file":  "../submission_screens/p2_data.png",
+        "caption":  "Worker results in PostgreSQL: transaction status, one debit + one credit ledger row per SUCCESS, totals by status",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_events",
+        "file":  "../submission_screens/p2_events.png",
+        "caption":  "Append-only audit log: PENDING (payment service) -\u003e PROCESSING -\u003e SUCCESS (worker) for one payment",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_cache",
+        "file":  "../submission_screens/p2_cache.png",
+        "caption":  "Redis cache: the first balance read is a MISS (PostgreSQL), the second a HIT from Redis - faster",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_redis",
+        "file":  "../submission_screens/p2_redis.png",
+        "caption":  "Redis holds the payment stream + consumer group (async queue), cache entries with TTLs, and the token buckets of the rate limiter",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p2_pay_cli",
+        "file":  "../submission_screens/p2_pay_cli.png",
+        "caption":  "Asynchronous processing: POST returns 202 at once, the second request with the same Idempotency-Key is replayed (no second debit), the worker moves it PENDING -\u003e SUCCESS",
+        "section":  "phase2"
+    },
+    {
+        "key":  "p3_trace_cli",
+        "file":  "../submission_screens/p3_trace_cli.png",
+        "caption":  "Structured logging: one request id followed Gateway -\u003e payment service -\u003e Redis Stream -\u003e worker -\u003e bank -\u003e PostgreSQL",
+        "section":  "phase3"
+    },
+    {
+        "key":  "p3_stats",
+        "file":  "../submission_screens/p3_stats.png",
+        "caption":  "Metrics: requests, 429s by scope, cache hit ratio, DB queries, settled payments, retries and circuit-breaker openings per node (from GET /stats)",
+        "section":  "phase3"
+    },
+    {
+        "key":  "p3_pytest",
+        "file":  "../submission_screens/p3_pytest.png",
+        "caption":  "Automated tests: token bucket, Lua script, circuit breaker, retry/backoff, gateway proxy, worker settlement logic, dashboard and Pay Console routes - all pass",
+        "section":  "phase3"
+    },
+    {
+        "key":  "p3_locust_scale-u100",
+        "file":  "../submission_screens/p3_locust_scale-u100.png",
+        "section":  "loadtest",
+        "caption":  "Locust load-test report - 100 concurrent users (60 s): request statistics per endpoint, failures (429) and response-time percentiles"
+    },
+    {
+        "key":  "p3_locust_scale-u200",
+        "file":  "../submission_screens/p3_locust_scale-u200.png",
+        "section":  "loadtest",
+        "caption":  "Locust load-test report - 200 concurrent users (60 s): request statistics per endpoint, failures (429) and response-time percentiles"
+    },
+    {
+        "key":  "p3_locust_scale-u500",
+        "file":  "../submission_screens/p3_locust_scale-u500.png",
+        "section":  "loadtest",
+        "caption":  "Locust load-test report - 500 concurrent users (60 s): request statistics per endpoint, failures (429) and response-time percentiles"
+    }
+]

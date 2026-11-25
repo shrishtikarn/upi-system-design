@@ -1,0 +1,66 @@
+[1mUPI multi-user scenario test[0m  gateway=http://127.0.0.1:8080  users=100  seed=42
+  gateway health: UP
+  bank switch -> [1mnormal[0m  (HTTP 200, failure_rate=0.01)
+  money in system before: Rs 1000100000.00 across 1003 accounts
+
+=== PHASE p2p ===
+[1m100 different users each send money to another user (person to person)[0m
+  [32m100/100 as expected[0m   outcomes: SUCCESS=100   settle p50=0.74s p95=1.56s   27.2 payments/s end-to-end
+
+=== PHASE p2m ===
+[1m30 users pay the merchant chaipoint@okicici (person to merchant)[0m
+  [32m30/30 as expected[0m   outcomes: SUCCESS=30   settle p50=0.81s p95=1.03s
+
+=== PHASE hot-payee ===
+[1m20 users pay alice@okaxis at the same moment (row-lock contention on one account)[0m
+  [32m20/20 as expected[0m   outcomes: SUCCESS=20   settle p50=0.68s p95=0.78s
+
+=== PHASE overspend ===
+[1mbob sends 3 payments at once that together exceed his balance[0m
+  bob's balance Rs 2244.00 -> 3 x Rs 898: only 2 can fit
+  [32m3/3 as expected[0m   outcomes: SUCCESS=2, FAILED=1   settle p50=0.38s p95=0.38s   2 SUCCESS / 1 INSUFFICIENT_FUNDS
+
+=== PHASE idempotency ===
+[1m10 users double-tap Pay (same Idempotency-Key twice); 5 reuse a key for a different amount[0m
+  [32m10/10 as expected[0m   outcomes: SUCCESS=10   settle p50=0.37s p95=0.38s
+  [32m5/5 as expected[0m   outcomes: SUCCESS=5   settle p50=0.48s p95=0.49s
+
+=== PHASE negative ===
+[1mbusiness declines and invalid requests (30 users)[0m
+  [32m10/10 as expected[0m   outcomes: FAILED=10
+  [32m1/1 as expected[0m   outcomes: FAILED=1
+  [32m4/4 as expected[0m   outcomes: HTTP 422 AMOUNT_LIMIT_EXCEEDED=4
+  [32m4/4 as expected[0m   outcomes: HTTP 422 SAME_PAYER_PAYEE=4
+  [32m4/4 as expected[0m   outcomes: HTTP 404 PAYEE_VPA_NOT_FOUND=4
+  [32m4/4 as expected[0m   outcomes: HTTP 422 VALIDATION_ERROR=4
+  [32m4/4 as expected[0m   outcomes: HTTP 400 MISSING_IDEMPOTENCY_KEY=4
+
+=== PHASE rate-limit ===
+[1muser0196@mockbank floods 30 payment requests in parallel; another user pays at the same time[0m
+  flood result: HTTP 202 x10, HTTP 429 x20   first 429: Retry-After=1s limit=10 policy=write
+  bystander user0002@mockbank -> SUCCESS (unaffected)
+
+=== PHASE chaos-flaky ===
+[1mbank switch fails 50% of calls; 20 users pay (workers retry with exponential backoff)[0m
+  bank switch -> [1mflaky[0m  (HTTP 200, failure_rate=0.5)
+  [32m20/20 as expected[0m   outcomes: SUCCESS=20   settle p50=0.47s p95=21.69s   19 bank retries
+
+=== PHASE chaos-down ===
+[1mbank switch DOWN; 10 users pay (circuit breaker opens, payments wait in the queue)[0m
+  bank switch -> [1mdown[0m  (HTTP 200, failure_rate=1.0)
+  after 10 s: circuit breaker opened 2 time(s); worker npci breakers: {'worker-1': 'OPEN', 'worker-2': 'OPEN'}
+=== PHASE chaos-recover ===
+[1mbank back to normal: waiting payments are re-delivered (XAUTOCLAIM) and finish[0m
+  bank switch -> [1mnormal[0m  (HTTP 200, failure_rate=0.01)
+  [32m10/10 as expected[0m   outcomes: SUCCESS=10   settle p50=33.85s p95=33.88s   breaker opened 2x
+
+=== PHASE verify ===
+[1mconsistency checks: money conserved, balances match SUCCESS payments, nothing stuck[0m
+  [32mPASS[0m  Total money in the system unchanged  [2mRs 1000100000.00 -> Rs 1000100000.00[0m
+  [32mPASS[0m  Every one of 233 tracked accounts moved by exactly its SUCCESS payments  [2mall match[0m
+  [32mPASS[0m  No negative balances  [2m0 negative[0m
+  [32mPASS[0m  No payment left PENDING/PROCESSING  [2m0 stuck[0m
+  [32mPASS[0m  Every double tap returned the original transaction (one debit)  [2m10 double taps[0m
+
+[1mSummary[0m: 259/259 scenario requests behaved as expected, 5/5 consistency checks passed, 228 distinct paying users, 232 distinct people involved, 73 s
+[32mALL PASSED[0m

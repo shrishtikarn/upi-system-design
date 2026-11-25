@@ -1,0 +1,13 @@
+[project]
+name = "upi-system"
+version = "1.0.0"
+description = "UPI payment system design: API gateway, rate limiting, caching, async workers, fault tolerance"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

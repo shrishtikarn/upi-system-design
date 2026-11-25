@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPI Pay Console</title>
+<!--
+  Person-to-person payment console for the UPI system design project.
+  Served by the API gateway at GET /pay. Everything here goes through the public API, exactly like a phone app:
+    GET  /api/v1/vpa/{vpa}                       payee verification (name shown before paying)
+    GET  /api/v1/accounts/{vpa}/balance          balances before / after
+    GET  /api/v1/accounts/{vpa}/transactions     the payer's history
+    POST /api/v1/payments                        send money (Idempotency-Key per tap)
+    GET  /api/v1/payments/{txn_id}               status polling until SUCCESS / FAILED
+  plus the demo-only GET /dashboard/api/users (people pickers) and
+  GET /dashboard/api/transactions/{id}/events (audit trail). Single file, no external libraries.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f3f2ef; --surface-1: #fcfcfb; --panel: #ffffff; --border: #e3e1dc;
+    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #6f6d68;
+    --accent: #2a78d6; --accent-soft: #e8f1fc;
+    --good: #0ca30c; --good-soft: #e9f7e9; --warning: #fab219; --warning-soft: #fff6e0;
+    --critical: #d03b3b; --critical-soft: #fdf1f1; --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+         font: 15px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 18px 22px 40px; }
+  header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  header .spacer { flex: 1; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); font-weight: 600; }
+  a { color: var(--accent); }
+  .mono { font-family: "Cascadia Mono", Consolas, Menlo, monospace; font-size: 0.9em; }
+  .muted { color: var(--text-muted); }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .grid { display: grid; grid-template-columns: 430px 1fr; gap: 12px; align-items: start; }
+  .col { display: grid; gap: 12px; }
+  label { display: block; font-size: 12.5px; color: var(--text-secondary); font-weight: 600; margin: 10px 0 4px; }
+  input, select { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-1); }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  .who { display: flex; gap: 10px; align-items: center; margin-top: 6px; padding: 8px 10px; border-radius: 8px; background: var(--surface-1);
+         border: 1px dashed var(--border); min-height: 46px; font-size: 13.5px; }
+  .who.ok { border-style: solid; border-color: var(--good); background: var(--good-soft); }
+  .who.bad { border-style: solid; border-color: var(--critical); background: var(--critical-soft); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; }
+  .amount-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .big-amount { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .btn { font: inherit; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-1); padding: 7px 12px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); width: 100%; padding: 11px; font-size: 16px; margin-top: 14px; }
+  .btn.primary:disabled { opacity: 0.55; cursor: wait; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips .btn { font-size: 12.5px; padding: 5px 10px; font-weight: 600; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--text-secondary); }
+  .check input { width: auto; }
+
+  /* journey */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .step { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; background: var(--surface-1); min-height: 92px; }
+  .step .t { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 650; }
+  .step .v { font-size: 18px; font-weight: 650; margin-top: 4px; }
+  .step .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .step.done { border-color: var(--good); background: var(--good-soft); }
+  .step.live { border-color: var(--accent); background: var(--accent-soft); }
+  .step.fail { border-color: var(--critical); background: var(--critical-soft); }
+  .result { margin-top: 12px; padding: 12px 14px; border-radius: var(--radius); display: none; font-size: 15px; }
+  .result.show { display: block; }
+  .result.ok { background: var(--good-soft); border: 1px solid var(--good); }
+  .result.bad { background: var(--critical-soft); border: 1px solid var(--critical); }
+  .result.warn { background: var(--warning-soft); border: 1px solid var(--warning); }
+  .kv { display: grid; grid-template-columns: 150px 1fr; gap: 3px 10px; font-size: 13px; margin-top: 10px; }
+  .kv div:nth-child(odd) { color: var(--text-muted); }
+  .bal { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bal .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; background: var(--surface-1); }
+  .bal .name { font-weight: 650; }
+  .bal .row { display: flex; justify-content: space-between; font-size: 13.5px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .delta.neg { color: var(--critical); font-weight: 650; } .delta.pos { color: var(--good); font-weight: 650; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--text-secondary); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); padding: 6px 6px; }
+  td { border-bottom: 1px solid var(--border); padding: 6px 6px; vertical-align: top; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; border: 1px solid var(--border); }
+  .pill.SUCCESS { background: var(--good-soft); border-color: var(--good); color: #0a6b0a; }
+  .pill.FAILED, .pill.REJECTED { background: var(--critical-soft); border-color: var(--critical); color: #9b2222; }
+  .pill.PENDING, .pill.PROCESSING { background: var(--warning-soft); border-color: var(--warning); color: #6b4a00; }
+  .pill.REPLAY { background: var(--accent-soft); border-color: var(--accent); color: #1c548f; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 1000px) { .grid, .two, .steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>UPI Pay Console</h1>
+    <span class="muted">Send money from one person to another, through the real API gateway</span>
+    <span class="spacer"></span>
+    <a href="/dashboard">Open the live system dashboard &rarr;</a>
+  </header>
+
+  <div class="grid">
+    <!-- left: the "phone app" -->
+    <div class="col">
+      <section class="panel" id="send-panel">
+        <h2>Send money</h2>
+        <label for="payer">From (payer)</label>
+        <input id="payer" list="people" placeholder="alice@okaxis" autocomplete="off">
+        <div class="who" id="payer-card"><span class="muted">Choose who is paying</span></div>
+
+        <label for="payee">To (payee VPA)</label>
+        <input id="payee" list="people" placeholder="bob@oksbi" autocomplete="off">
+        <div class="who" id="payee-card"><span class="muted">Enter a VPA; the registered name is checked before you pay</span></div>
+        <datalist id="people"></datalist>
+
+        <div class="amount-row">
+          <div><label for="amount">Amount (Rs)</label><input id="amount" class="big-amount" inputmode="decimal" value="150.00"></div>
+          <div><label for="note">Note</label><input id="note" maxlength="100" value="dinner split"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="twice"> Simulate a double tap (send the same Idempotency-Key twice)</label>
+        <button class="btn primary" id="pay-btn">Pay</button>
+      </section>
+
+      <section class="panel">
+        <h2>Scenarios</h2>
+        <div class="chips" id="scenarios">
+          <button class="btn" data-s="p2p">P2P: Alice &rarr; Bob</button>
+          <button class="btn" data-s="p2m">P2M: pay a merchant</button>
+          <button class="btn" data-s="decline">Bank declines (Rs x.13)</button>
+          <button class="btn" data-s="insufficient">Insufficient funds</button>
+          <button class="btn" data-s="limit">Over Rs 1 lakh limit</button>
+          <button class="btn" data-s="self">Pay yourself</button>
+          <button class="btn" data-s="unknown">Unknown payee</button>
+          <button class="btn" data-s="double">Double tap</button>
+        </div>
+        <p class="muted" style="font-size:12.5px;margin:10px 0 0">A scenario only fills in the form. Press <b>Pay</b> to send it.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Payments sent from this page</h2>
+        <table><thead><tr><th>Time</th><th>From &rarr; To</th><th class="num">Rs</th><th>Result</th></tr></thead>
+          <tbody id="session-log"><tr><td colspan="4" class="muted">Nothing sent yet</td></tr></tbody></table>
+      </section>
+    </div>
+
+    <!-- right: what happened -->
+    <div class="col">
+      <section class="panel" id="journey-panel">
+        <h2>Payment journey</h2>
+        <div class="steps">
+          <div class="step" id="st-verify"><div class="t">1 · Verify payee</div><div class="v">-</div><div class="s"></div></div>
+          <div class="step" id="st-accept"><div class="t">2 · Gateway &amp; API</div><div class="v">-</div><div class="s"></div></div>
+          <div class="step" id="st-process"><div class="t">3 · Worker &amp; bank</div><div class="v">-</div><div class="s"></div></div>
+          <div class="step" id="st-final"><div class="t">4 · Settled</div><div class="v">-</div><div class="s"></div></div>
+        </div>
+        <div class="result" id="result"></div>
+        <div class="kv" id="details"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Balances before and after</h2>
+        <div class="bal" id="balances">
+          <div class="card muted">Payer balance appears here</div>
+          <div class="card muted">Payee balance appears here</div>
+        </div>
+      </section>
+
+      <div class="two">
+        <section class="panel">
+          <h2>Audit trail (transaction_events)</h2>
+          <table><thead><tr><th>From &rarr; To</th><th>Actor</th><th>Detail</th></tr></thead>
+            <tbody id="events"><tr><td colspan="3" class="muted">Send a payment to see its audit trail</td></tr></tbody></table>
+        </section>
+        <section class="panel">
+          <h2 id="history-title">Payer's recent transactions</h2>
+          <table><thead><tr><th>With</th><th class="num">Rs</th><th>Status</th></tr></thead>
+            <tbody id="history"><tr><td colspan="3" class="muted">-</td></tr></tbody></table>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (r) => r == null ? "-" : Number(r).toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let people = [];
+
+function clientId() { return "pay-console-" + ($("payer").value.trim() || "anon"); }
+
+async function api(method, path, body, extraHeaders = {}) {
+  const headers = {"X-Client-ID": clientId(), ...extraHeaders};
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+  const t0 = performance.now();
+  const res = await fetch(path, {method, headers, body: body === undefined ? undefined : JSON.stringify(body)});
+  let data = null; try { data = await res.json(); } catch (_) {}
+  return {status: res.status, headers: res.headers, data, ms: performance.now() - t0};
+}
+
+async function loadPeople() {
+  try {
+    const r = await fetch("/dashboard/api/users?limit=1100");
+    people = (await r.json()).users || [];
+    $("people").innerHTML = people.map((p) => `<option value="${esc(p.vpa)}">${esc(p.name)} · ${esc(p.bank)}</option>`).join("");
+  } catch (_) { /* pickers still work by typing */ }
+}
+
+function card(el, cls, html) { el.className = "who " + cls; el.innerHTML = html; }
+function avatar(name) { return `<span class="avatar">${esc((name || "?").slice(0, 1).toUpperCase())}</span>`; }
+
+async function showPayer() {
+  const vpa = $("payer").value.trim().toLowerCase();
+  if (!vpa) return card($("payer-card"), "", '<span class="muted">Choose who is paying</span>');
+  const b = await api("GET", `/api/v1/accounts/${encodeURIComponent(vpa)}/balance`);
+  const v = await api("GET", `/api/v1/vpa/${encodeURIComponent(vpa)}`);
+  if (b.status === 200 && v.status === 200) {
+    card($("payer-card"), "ok", `${avatar(v.data.name)}<div><b>${esc(v.data.name)}</b> <span class="muted">${esc(b.data.bank)} ${esc(b.data.account)}</span><br>Balance <b>Rs ${fmt(b.data.balance)}</b></div>`);
+  } else {
+    card($("payer-card"), "bad", `<span>${esc(vpa)}: ${esc((b.data || v.data || {}).message || "HTTP " + b.status)}</span>`);
+  }
+  loadHistory(vpa);
+}
+
+async function verifyPayee() {
+  const vpa = $("payee").value.trim().toLowerCase();
+  if (!vpa) { card($("payee-card"), "", '<span class="muted">Enter a VPA</span>'); return null; }
+  const v = await api("GET", `/api/v1/vpa/${encodeURIComponent(vpa)}`);
+  if (v.status === 200) {
+    card($("payee-card"), "ok", `${avatar(v.data.name)}<div>Paying <b>${esc(v.data.name)}</b><br><span class="muted">${esc(v.data.vpa)} · ${esc(v.data.bank)} · verified (X-Cache: ${esc(v.headers.get("x-cache"))})</span></div>`);
+    return v;
+  }
+  card($("payee-card"), "bad", `<span><b>${esc(vpa)}</b> - ${esc((v.data || {}).message || "HTTP " + v.status)}</span>`);
+  return v;
+}
+
+function step(id, cls, value, sub) {
+  const el = $(id); el.className = "step " + (cls || "");
+  el.querySelector(".v").textContent = value; el.querySelector(".s").textContent = sub || "";
+}
+function resetJourney() {
+  for (const id of ["st-verify", "st-accept", "st-process", "st-final"]) step(id, "", "-", "");
+  $("result").className = "result"; $("details").innerHTML = "";
+  $("events").innerHTML = '<tr><td colspan="3" class="muted">waiting...</td></tr>';
+}
+function result(cls, html) { const r = $("result"); r.className = "result show " + cls; r.innerHTML = html; }
+function details(obj) {
+  $("details").innerHTML = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== "")
+    .map(([k, v]) => `<div>${esc(k)}</div><div class="mono">${esc(v)}</div>`).join("");
+}
+
+async function balanceOf(vpa) {
+  const r = await api("GET", `/api/v1/accounts/${encodeURIComponent(vpa)}/balance`);
+  return r.status === 200 ? r.data : null;
+}
+function renderBalances(payer, payee, before, after) {
+  const one = (vpa, b, a) => {
+    const p = people.find((x) => x.vpa === vpa);
+    const delta = (b && a) ? (a.balance_paise - b.balance_paise) / 100 : null;
+    const cls = delta == null || delta === 0 ? "" : (delta < 0 ? "neg" : "pos");
+    return `<div class="card"><div class="name">${esc(p ? p.name : vpa)}</div><div class="muted mono">${esc(vpa)}</div>
+      <div class="row"><span>Before</span><span>Rs ${fmt(b && b.balance)}</span></div>
+      <div class="row"><span>After</span><span>${a ? "Rs " + fmt(a.balance) : "..."}</span></div>
+      <div class="row"><span>Change</span><span class="delta ${cls}">${delta == null ? "-" : (delta > 0 ? "+" : "") + fmt(delta)}</span></div></div>`;
+  };
+  $("balances").innerHTML = one(payer, before[0], after[0]) + one(payee, before[1], after[1]);
+}
+
+async function loadEvents(txnId) {
+  const r = await fetch(`/dashboard/api/transactions/${txnId}/events`);
+  if (!r.ok) return;
+  const d = await r.json();
+  $("events").innerHTML = d.events.map((e) => `<tr><td><b>${esc(e.from || "new")}</b> &rarr; <span class="pill ${esc(e.to)}">${esc(e.to)}</span></td>
+    <td class="mono">${esc(e.actor)}</td><td class="mono" style="font-size:11.5px">${esc(JSON.stringify(e.detail))}</td></tr>`).join("");
+}
+async function loadHistory(vpa) {
+  if (!vpa) return;
+  $("history-title").textContent = `Recent transactions of ${vpa}`;
+  const r = await api("GET", `/api/v1/accounts/${encodeURIComponent(vpa)}/transactions`);
+  if (r.status !== 200) { $("history").innerHTML = `<tr><td colspan="3" class="muted">${esc((r.data || {}).message || "HTTP " + r.status)}</td></tr>`; return; }
+  const rows = r.data.transactions;
+  $("history").innerHTML = rows.length ? rows.map((t) => {
+    const other = t.direction === "DEBIT" ? t.payee_vpa : t.payer_vpa;
+    const sign = t.direction === "DEBIT" ? "-" : "+";
+    return `<tr><td><span class="muted">${t.direction === "DEBIT" ? "to" : "from"}</span> ${esc(other)}</td>
+      <td class="num">${sign}${fmt(t.amount)}</td><td><span class="pill ${esc(t.status)}">${esc(t.status)}</span> ${esc(t.failure_reason || "")}</td></tr>`;
+  }).join("") : '<tr><td colspan="3" class="muted">no transactions yet</td></tr>';
+}
+
+function logSession(payer, payee, amount, outcome, cls) {
+  const tb = $("session-log");
+  if (tb.querySelector("td[colspan]")) tb.innerHTML = "";
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="mono">${new Date().toLocaleTimeString()}</td><td>${esc(payer)} &rarr; ${esc(payee)}</td>
+    <td class="num">${fmt(amount)}</td><td><span class="pill ${cls}">${esc(outcome)}</span></td>`;
+  tb.prepend(tr);
+}
+
+function newKey() { return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/-/g, ""); }
+
+async function pay() {
+  const payer = $("payer").value.trim().toLowerCase(), payee = $("payee").value.trim().toLowerCase();
+  const amount = $("amount").value.trim(), note = $("note").value.trim();
+  $("pay-btn").disabled = true; resetJourney();
+  try {
+    // 1) payee verification (what the app shows as "Paying Bob Mehta")
+    const v = await verifyPayee();
+    if (v && v.status === 200) step("st-verify", "done", v.data.name, `${payee} · ${v.headers.get("x-cache")}`);
+    else step("st-verify", "fail", "Not verified", v ? `HTTP ${v.status}` : "no payee");
+
+    const before = [await balanceOf(payer), await balanceOf(payee)];
+    renderBalances(payer, payee, before, [null, null]);
+
+    // 2) POST through the gateway
+    const key = newKey();
+    const body = {payer_vpa: payer, payee_vpa: payee, amount, note: note || null};
+    let r = await api("POST", "/api/v1/payments", body, {"Idempotency-Key": key});
+    let replay = null;
+    if ($("twice").checked && (r.status === 202 || r.status === 200)) {
+      await sleep(300);
+      replay = await api("POST", "/api/v1/payments", body, {"Idempotency-Key": key});
+    }
+    const common = {
+      "HTTP status": r.status + (replay ? `, then ${replay.status} (Idempotent-Replay: ${replay.headers.get("idempotent-replay")})` : ""),
+      "X-Request-ID": r.headers.get("x-request-id"), "Idempotency-Key": key,
+      "Handled by": r.headers.get("x-upstream-node"), "Gateway latency": r.headers.get("x-gateway-latency-ms") && r.headers.get("x-gateway-latency-ms") + " ms",
+      "Rate limit left": r.headers.get("x-ratelimit-remaining") && `${r.headers.get("x-ratelimit-remaining")} of ${r.headers.get("x-ratelimit-limit")} (${r.headers.get("x-ratelimit-policy")})`,
+    };
+    if (r.status !== 202 && r.status !== 200) {
+      const d = r.data || {};
+      step("st-accept", "fail", `HTTP ${r.status}`, d.error || "");
+      step("st-process", "", "not started", "nothing was queued"); step("st-final", "fail", "Rejected", "no money moved");
+      result("bad", `<b>Payment rejected - ${esc(d.error || r.status)}</b><br>${esc(d.message || "")}${r.status === 429 ? `<br>Retry-After: ${esc(r.headers.get("retry-after"))} s` : ""}`);
+      details({...common, "Error": d.error, "Message": d.message});
+      renderBalances(payer, payee, before, before);
+      logSession(payer, payee, amount, d.error || ("HTTP " + r.status), "REJECTED");
+      $("events").innerHTML = '<tr><td colspan="3" class="muted">No transaction row: rejected before it was stored</td></tr>';
+      return;
+    }
+    const txn = r.data;
+    step("st-accept", "done", `${r.status} Accepted`, `${txn.status} · ${r.headers.get("x-upstream-node")} · ${Math.round(r.ms)} ms`);
+    details({...common, "txn_id": txn.txn_id});
+
+    // 3) poll status
+    step("st-process", "live", "Queued", "waiting for a worker");
+    let last = txn, seen = new Set([txn.status]); const t0 = performance.now();
+    while (performance.now() - t0 < 60000) {
+      const s = await api("GET", `/api/v1/payments/${txn.txn_id}`);
+      if (s.status === 200) {
+        last = s.data;
+        if (!seen.has(last.status)) { seen.add(last.status); }
+        if (last.status === "PROCESSING") step("st-process", "live", "Processing", "worker calling the bank switch");
+        if (last.status === "PENDING" && last.attempts > 0) step("st-process", "live", "Retrying", `attempt ${last.attempts}: ${last.failure_reason || ""}`);
+        if (last.status === "SUCCESS" || last.status === "FAILED") break;
+      }
+      await sleep(300);
+    }
+    const secs = ((performance.now() - t0) / 1000).toFixed(2);
+    const after = [await balanceOf(payer), await balanceOf(payee)];
+    renderBalances(payer, payee, before, after);
+    await loadEvents(txn.txn_id);
+    loadHistory(payer);
+    showPayer();
+
+    const evActors = Array.from($("events").querySelectorAll("td.mono")).map((td) => td.textContent).filter((a) => a.startsWith("worker"));
+    if (last.status === "SUCCESS") {
+      step("st-process", "done", "Bank approved", `${evActors[0] || "worker"} · attempts ${last.attempts}`);
+      step("st-final", "done", "SUCCESS", `in ${secs} s · ${last.bank_ref}`);
+      result("ok", `<b>Rs ${fmt(last.amount)} sent to ${esc(payee)}</b>. Bank reference <span class="mono">${esc(last.bank_ref)}</span>.` +
+        (replay ? `<br>The second tap returned the <b>same</b> transaction (HTTP ${replay.status}), so the payer was debited only once.` : ""));
+      logSession(payer, payee, amount, replay ? "SUCCESS (1 debit, 2 taps)" : "SUCCESS", replay ? "REPLAY" : "SUCCESS");
+    } else if (last.status === "FAILED") {
+      step("st-process", "fail", last.failure_reason === "INSUFFICIENT_FUNDS" ? "Balance check" : "Bank answered", last.failure_reason);
+      step("st-final", "fail", "FAILED", `in ${secs} s · no money moved`);
+      result("bad", `<b>Payment failed: ${esc(last.failure_reason)}</b><br>The transaction was stored and audited, but no money moved.`);
+      logSession(payer, payee, amount, "FAILED " + last.failure_reason, "FAILED");
+    } else {
+      step("st-final", "", last.status, "still in progress");
+      result("warn", `<b>Still ${esc(last.status)}</b> after ${secs} s - the worker will keep retrying (bank may be down).`);
+      logSession(payer, payee, amount, last.status, "PENDING");
+    }
+    details({...common, "txn_id": txn.txn_id, "Final status": last.status, "Failure reason": last.failure_reason,
+             "Bank reference": last.bank_ref, "Delivery attempts": last.attempts, "Time to settle": secs + " s"});
+  } catch (e) {
+    result("bad", "Error: " + esc(e.message));
+  } finally { $("pay-btn").disabled = false; }
+}
+
+const SCENARIOS = {
+  p2p:     {payer: "alice@okaxis", payee: "bob@oksbi", amount: "150.00", note: "dinner split"},
+  p2m:     {payer: "bob@oksbi", payee: "chaipoint@okicici", amount: "40.00", note: "2 x masala chai"},
+  decline: {payer: "alice@okaxis", payee: "bob@oksbi", amount: "1.13", note: "will be declined"},
+  insufficient: {payer: "chaipoint@okicici", payee: "alice@okaxis", amount: "99999.00", note: "more than the balance"},
+  limit:   {payer: "user0001@mockbank", payee: "user0002@mockbank", amount: "150000.00", note: "above the P2P limit"},
+  self:    {payer: "alice@okaxis", payee: "alice@okaxis", amount: "10.00", note: "to myself"},
+  unknown: {payer: "alice@okaxis", payee: "nobody@okhdfc", amount: "10.00", note: "typo in VPA"},
+  double:  {payer: "user0003@mockbank", payee: "user0004@mockbank", amount: "250.00", note: "double tap", twice: true},
+};
+$("scenarios").addEventListener("click", (ev) => {
+  const s = SCENARIOS[ev.target.dataset.s]; if (!s) return;
+  $("payer").value = s.payer; $("payee").value = s.payee; $("amount").value = s.amount; $("note").value = s.note;
+  $("twice").checked = !!s.twice; showPayer(); verifyPayee();
+});
+$("payer").addEventListener("change", showPayer);
+$("payee").addEventListener("change", verifyPayee);
+$("pay-btn").addEventListener("click", pay);
+window.upiPay = {pay, showPayer, verifyPayee, SCENARIOS};  // used by the automated screenshot script
+
+loadPeople().then(() => {
+  const q = new URLSearchParams(location.search);
+  $("payer").value = q.get("payer") || "alice@okaxis";
+  $("payee").value = q.get("payee") || "bob@oksbi";
+  showPayer(); verifyPayee();
+});
+</script>
+</body>
+</html>

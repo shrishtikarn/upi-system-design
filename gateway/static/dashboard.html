@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPI System - Live Dashboard</title>
+<!--
+  Live dashboard for the UPI system design project.
+  Served by the API gateway at GET /dashboard. Polls every 2 s:
+    /health                         node health + circuit breakers (gateway health monitor)
+    /stats                          metrics of every node (rates are computed from successive snapshots)
+    /dashboard/api/summary          payment counts by status + total money in the system (Postgres)
+    /dashboard/api/transactions     latest payments (Postgres)
+    /dashboard/api/transactions/{id}/events   audit trail of one payment
+  Buttons send real requests through the gateway (/api/v1/...) or switch the mock bank's mode.
+  Single file, no external libraries, works offline.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f3f2ef;
+    --surface-1: #fcfcfb;
+    --panel: #ffffff;
+    --border: #e3e1dc;
+    --grid: #ebe9e4;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #6f6d68;
+    --accent: #2a78d6;
+    --series-fwd: #2a78d6;      /* forwarded requests  - categorical slot 1 */
+    --series-rl: #eb6834;       /* rate-limited (429)  - categorical slot 2 */
+    --series-queue: #6250d6;    /* queue depth         - categorical slot 7 */
+    --series-done: #1baf7a;     /* payments settled    - categorical slot 3 (direct label = relief rule) */
+    --good: #0ca30c;
+    --warning: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface-0); color: var(--text-primary);
+    font: 15px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1520px; margin: 0 auto; padding: 18px 22px 40px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); font-weight: 600; }
+  .mono { font-family: "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace; font-size: 0.92em; }
+  .muted { color: var(--text-muted); }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+
+  /* header */
+  header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  header .spacer { flex: 1; }
+  .meta { color: var(--text-secondary); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .banner { display: none; margin-bottom: 12px; padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--critical);
+            background: #fdf1f1; color: var(--text-primary); }
+  .banner.show { display: block; }
+
+  /* status pills: colour + icon + label, never colour alone */
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 8px; border-radius: 999px;
+          border: 1px solid var(--border); background: var(--surface-1); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+  .ic { width: 16px; height: 16px; border-radius: 50%; display: inline-grid; place-items: center; color: #fff; font-size: 10px; line-height: 1; flex: none; }
+  .ic.good { background: var(--good); } .ic.warning { background: var(--warning); color: #3a2a00; }
+  .ic.serious { background: var(--serious); } .ic.critical { background: var(--critical); }
+  .ic.neutral { background: #9a988f; } .ic.info { background: var(--accent); }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .kpi .label { font-size: 12.5px; color: var(--text-secondary); }
+  .kpi .value { font-size: 30px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.15; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .value small { font-size: 15px; font-weight: 500; color: var(--text-secondary); margin-left: 3px; }
+  .kpi .note { font-size: 12px; color: var(--text-muted); margin-top: 2px; min-height: 17px; }
+
+  /* pipeline */
+  .pipeline { display: grid; grid-template-columns: 1fr 34px 1fr 34px 1.15fr 34px 1fr 34px 1fr 34px 1.1fr; align-items: center; }
+  .stage { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-1); padding: 10px 12px; min-height: 158px; position: relative; }
+  .stage.bad { border-color: var(--critical); box-shadow: inset 0 0 0 1px var(--critical); }
+  .stage.warn { border-color: var(--warning); box-shadow: inset 0 0 0 1px var(--warning); }
+  .stage-title { font-size: 12.5px; font-weight: 650; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stage-big { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 4px; line-height: 1.1; }
+  .stage-unit { font-size: 12px; color: var(--text-secondary); }
+  .stage-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; min-height: 18px; }
+  .stage-nodes { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 11.5px; color: var(--text-secondary); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: 0; }
+  .stack { display: grid; gap: 10px; }
+  .stack .stage { min-height: 0; }
+  .arrow svg { width: 100%; height: 14px; display: block; overflow: visible; }
+  .arrow line { stroke: #c9c6bf; stroke-width: 2; }
+  .arrow path { fill: #c9c6bf; }
+  .arrow.active line { stroke: var(--accent); stroke-dasharray: 5 4; animation: flow 0.6s linear infinite; }
+  .arrow.active path { fill: var(--accent); }
+  .arrow.broken line { stroke: var(--critical); stroke-dasharray: 2 4; animation: none; }
+  .arrow.broken path { fill: var(--critical); }
+  .arrow.split { display: grid; gap: 54px; }
+  @keyframes flow { to { stroke-dashoffset: -9; } }
+
+  /* layout rows */
+  .row { display: grid; gap: 12px; margin-top: 12px; }
+  .row.charts { grid-template-columns: 1.4fr 1fr 1fr; }
+  .row.mid { grid-template-columns: 1.05fr 1fr 1.15fr; }
+  .row.bottom { grid-template-columns: 1.65fr 1fr; align-items: start; }
+
+  /* charts */
+  .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .legend { display: flex; gap: 14px; font-size: 12.5px; color: var(--text-secondary); }
+  .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  .chart { position: relative; height: 190px; }
+  .chart svg { width: 100%; height: 100%; display: block; }
+  .chart .gridline { stroke: var(--grid); stroke-width: 1; }
+  .chart .axis-label { fill: var(--text-muted); font-size: 11px; }
+  .chart .series { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .end-label { font-size: 11.5px; fill: var(--text-secondary); font-weight: 600; }
+  .chart .crosshair { stroke: #8f8c85; stroke-width: 1; stroke-dasharray: 3 3; }
+  .tooltip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--border); border-radius: 8px;
+             padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); white-space: nowrap; display: none; z-index: 5; }
+  .tooltip b { font-variant-numeric: tabular-nums; }
+  .tooltip i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+
+  /* controls */
+  .controls .group { margin-bottom: 12px; }
+  .controls .group-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+  button { font: inherit; font-size: 13.5px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+           border-radius: 8px; padding: 7px 11px; cursor: pointer; }
+  button:hover { border-color: #b8b5ad; background: #fff; }
+  button:active { transform: translateY(1px); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: #256abf; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; border-right: 1px solid var(--border); padding: 6px 12px; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--text-primary); color: #fff; }
+  .seg button.on.danger { background: var(--critical); }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 6px 8px; border-bottom: 1px solid #f0eee9; vertical-align: middle; white-space: nowrap; }
+  td.wrap { white-space: normal; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr.click { cursor: pointer; }
+  tbody tr.click:hover { background: #f6f8fd; }
+  tbody tr.sel { background: #eaf2fc; }
+  tbody tr.new td { animation: flash 1.8s ease-out; }
+  @keyframes flash { from { background: #fff4cc; } to { background: transparent; } }
+  .tx-scroll { max-height: 560px; overflow: auto; }
+
+  /* event log */
+  .log { max-height: 300px; overflow: auto; font-size: 13px; }
+  .log div { display: grid; grid-template-columns: 64px 18px 1fr; gap: 6px; padding: 4px 0; border-bottom: 1px solid #f2f0eb; align-items: start; }
+  .log .t { color: var(--text-muted); font-variant-numeric: tabular-nums; font-size: 12px; padding-top: 1px; }
+  .log .ic { width: 14px; height: 14px; font-size: 9px; margin-top: 3px; }
+
+  /* audit trail */
+  .trail { list-style: none; margin: 10px 0 0; padding: 0; }
+  .trail li { position: relative; padding: 0 0 14px 26px; }
+  .trail li::before { content: ""; position: absolute; left: 7px; top: 18px; bottom: 0; width: 2px; background: var(--border); }
+  .trail li:last-child::before { display: none; }
+  .trail .ic { position: absolute; left: 0; top: 2px; }
+  .trail .when { color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .kv { display: grid; grid-template-columns: 92px 1fr; gap: 3px 10px; font-size: 13px; margin-top: 8px; }
+  .kv div:nth-child(odd) { color: var(--text-secondary); }
+  .copy { font-size: 12px; padding: 3px 8px; margin-left: 6px; }
+  .empty { color: var(--text-muted); font-size: 13px; padding: 18px 0; text-align: center; }
+
+  @media (max-width: 1200px) {
+    .kpis { grid-template-columns: repeat(3, 1fr); }
+    .row.charts, .row.mid, .row.bottom { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: 1fr; gap: 6px; }
+    .arrow { transform: rotate(90deg); height: 24px; width: 40px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>UPI Payment System <span class="muted" style="font-weight:500">· live</span></h1>
+    <span id="overall" class="pill"><span class="ic neutral">…</span>connecting</span>
+    <div class="spacer"></div>
+    <div class="meta">
+      <span>Rate limiter: <b id="m-limiter">–</b></span>
+      <span>Bank: <b id="m-bank">–</b></span>
+      <span>Updated <span id="m-updated">–</span></span>
+    </div>
+  </header>
+  <div id="banner" class="banner"></div>
+
+  <!-- KPIs -->
+  <section class="kpis">
+    <div class="panel kpi"><div class="label">Requests forwarded</div><div class="value" id="k-fwd">–</div><div class="note">per second, through the gateway</div></div>
+    <div class="panel kpi"><div class="label">Rejected by rate limiter</div><div class="value" id="k-rl">–</div><div class="note" id="k-rl-note">429 Too Many Requests, per second</div></div>
+    <div class="panel kpi"><div class="label">Gateway latency p95</div><div class="value" id="k-p95">–</div><div class="note">forwarded requests, last 2 s</div></div>
+    <div class="panel kpi"><div class="label">Cache hit rate</div><div class="value" id="k-cache">–</div><div class="note" id="k-cache-note">Redis vs database reads</div></div>
+    <div class="panel kpi"><div class="label">Queue (waiting payments)</div><div class="value" id="k-queue">–</div><div class="note" id="k-queue-note">Redis Stream: pending + not yet read</div></div>
+    <div class="panel kpi"><div class="label">Payments: success / failed</div><div class="value" id="k-pay">–</div><div class="note" id="k-pay-note">all time, from PostgreSQL</div></div>
+  </section>
+
+  <!-- pipeline -->
+  <section class="panel">
+    <h2>How a request flows right now</h2>
+    <div class="pipeline">
+      <div class="stage" id="st-clients">
+        <div class="stage-title">Clients</div>
+        <div class="stage-big" id="pv-clients">–</div><div class="stage-unit">requests/s arriving</div>
+        <div class="stage-sub">phones, Locust, demo scripts</div>
+      </div>
+      <div class="arrow" id="ar-1"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div>
+      <div class="stage" id="st-gateway">
+        <div class="stage-title">API Gateway</div>
+        <div class="stage-big" id="pv-gw">–</div><div class="stage-unit">requests/s forwarded</div>
+        <div class="stage-sub" id="ps-gw"></div>
+        <div class="stage-nodes" id="pn-gateway"></div>
+      </div>
+      <div class="arrow" id="ar-2"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div>
+      <div class="stage" id="st-services">
+        <div class="stage-title">Services</div>
+        <div class="stage-big" id="pv-svc">–</div><div class="stage-unit">payments/s accepted (202)</div>
+        <div class="stage-sub" id="ps-svc"></div>
+        <div class="stage-nodes" id="pn-services"></div>
+      </div>
+      <div class="arrow" id="ar-3"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div>
+      <div class="stage" id="st-queue">
+        <div class="stage-title">Queue · Redis Stream</div>
+        <div class="stage-big" id="pv-queue">–</div><div class="stage-unit">payments waiting</div>
+        <div class="stage-sub" id="ps-queue"></div>
+      </div>
+      <div class="arrow" id="ar-4"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div>
+      <div class="stage" id="st-workers">
+        <div class="stage-title">Workers</div>
+        <div class="stage-big" id="pv-workers">–</div><div class="stage-unit">payments/s settled</div>
+        <div class="stage-sub" id="ps-workers"></div>
+        <div class="stage-nodes" id="pn-workers"></div>
+      </div>
+      <div class="arrow split"><div class="arrow" id="ar-5"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div><div class="arrow" id="ar-6"><svg viewBox="0 0 40 14" preserveAspectRatio="none"><line x1="2" y1="7" x2="32" y2="7"/><path d="M31,2 L39,7 L31,12 z"/></svg></div></div>
+      <div class="stack">
+        <div class="stage" id="st-bank">
+          <div class="stage-title">NPCI bank (mock)</div>
+          <div class="stage-big" id="pv-bank" style="font-size:22px">–</div><div class="stage-unit">bank calls/s</div>
+          <div class="stage-sub" id="ps-bank"></div>
+        </div>
+        <div class="stage" id="st-db">
+          <div class="stage-title">PostgreSQL</div>
+          <div class="stage-big" id="pv-db" style="font-size:20px">–</div><div class="stage-unit">total money in all accounts</div>
+          <div class="stage-sub" id="ps-db"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- charts -->
+  <section class="row charts">
+    <div class="panel">
+      <div class="chart-head"><h2>Throughput at the gateway (per second)</h2>
+        <div class="legend"><span><i style="background:var(--series-fwd)"></i>Forwarded</span><span><i style="background:var(--series-rl)"></i>Rejected (429)</span></div></div>
+      <div class="chart" id="c-throughput"></div>
+    </div>
+    <div class="panel"><h2>Queue depth (payments waiting)</h2><div class="chart" id="c-queue"></div></div>
+    <div class="panel"><h2>Payments settled per second</h2><div class="chart" id="c-done"></div></div>
+  </section>
+
+  <!-- controls, nodes, log -->
+  <section class="row mid">
+    <div class="panel controls">
+      <h2>Try it</h2>
+      <div class="group">
+        <div class="group-label">Payments (sent through the gateway like a real phone)</div>
+        <div class="btns">
+          <button class="primary" id="b-pay">Send a payment</button>
+          <button id="b-twice">Same payment twice</button>
+          <button id="b-decline">Declined payment (₹1.13)</button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-label">Rate limiter</div>
+        <div class="btns"><button id="b-flood">Flood: 80 requests from one phone</button></div>
+      </div>
+      <div class="group">
+        <div class="group-label">Simulated users (from this browser)</div>
+        <div class="seg" id="seg-traffic">
+          <button data-v="off" class="on">Off</button><button data-v="light">Light · ~7/s</button><button data-v="heavy">Heavy · ~50/s</button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-label">Bank (NPCI) behaviour - watch retries and the circuit breaker</div>
+        <div class="seg" id="seg-bank">
+          <button data-v="normal">Normal</button><button data-v="flaky">Flaky</button><button data-v="slow">Slow</button><button data-v="down">Down</button>
+        </div>
+      </div>
+      <div class="muted" style="font-size:12px">Big traffic spikes: use Locust (docker compose --profile loadtest up -d locust).</div>
+    </div>
+
+    <div class="panel">
+      <h2>Nodes (from GET /health)</h2>
+      <table>
+        <thead><tr><th>Node</th><th>Status</th><th>Circuit</th><th class="num">Check</th></tr></thead>
+        <tbody id="nodes"><tr><td colspan="4" class="empty">waiting for the gateway…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>What just happened</h2>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+
+  <!-- transactions -->
+  <section class="row bottom">
+    <div class="panel">
+      <div class="chart-head"><h2>Latest transactions (click one)</h2><span class="muted" style="font-size:12px" id="tx-count"></span></div>
+      <div class="tx-scroll">
+        <table>
+          <thead><tr><th>Time</th><th>Transaction</th><th>From → To</th><th class="num">Amount</th><th>Status</th><th>Detail</th><th class="num">Tries</th></tr></thead>
+          <tbody id="txs"><tr><td colspan="7" class="empty">No transactions yet - press "Send a payment".</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel" id="detail">
+      <h2>Journey of one payment</h2>
+      <div class="empty" id="detail-empty">Click a transaction to see every step it went through: which node handled it, when, and why.</div>
+      <div id="detail-body" style="display:none"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+const POLL_MS = 2000;
+const HISTORY = 90;                 // points kept for the charts (90 x 2 s = 3 minutes)
+const ST = {
+  prev: null, history: [], firstHealth: true, nodeState: {}, bankMode: null, overall: null, limiter: null,
+  moneyBaseline: null, seenTx: new Set(), selected: null, selectedFinal: false, traffic: "off", dir: 0, failures: 0,
+};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ------------------------------------------------------------------ formatting
+const fmtRate = (v) => (v == null || !isFinite(v)) ? "–" : (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString("en-IN"));
+const fmtInt = (v) => (v == null) ? "–" : Math.round(v).toLocaleString("en-IN");
+const fmtMs = (v) => (v == null) ? "–" : (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString("en-IN"));
+const rupees = (paise) => "₹" + (paise / 100).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const clock = (d = new Date()) => d.toLocaleTimeString("en-GB", { hour12: false });
+const shortId = (id) => String(id).slice(0, 8);
+
+const STATUS_STYLE = {
+  UP: ["good", "✓"], SUCCESS: ["good", "✓"], CLOSED: ["good", "✓"], normal: ["good", "✓"],
+  DEGRADED: ["warning", "!"], PENDING: ["warning", "…"], HALF_OPEN: ["warning", "?"], flaky: ["warning", "!"], slow: ["serious", "!"],
+  PROCESSING: ["info", "↻"],
+  DOWN: ["critical", "✕"], FAILED: ["critical", "✕"], OPEN: ["critical", "✕"], down: ["critical", "✕"],
+  UNKNOWN: ["neutral", "?"],
+};
+function pill(status, label) {
+  const [cls, glyph] = STATUS_STYLE[status] || ["neutral", "•"];
+  return `<span class="pill"><span class="ic ${cls}">${glyph}</span>${esc(label ?? status)}</span>`;
+}
+function dotColor(status) {
+  const cls = (STATUS_STYLE[status] || ["neutral"])[0];
+  return { good: "var(--good)", warning: "var(--warning)", serious: "var(--serious)", critical: "var(--critical)", info: "var(--accent)" }[cls] || "#9a988f";
+}
+
+// ------------------------------------------------------------------ metrics helpers (same format as common/metrics.py)
+function parseKey(key) {
+  const i = key.indexOf("{");
+  if (i < 0) return [key, {}];
+  const labels = {};
+  key.slice(i + 1, -1).replace(/(\w+)="([^"]*)"/g, (_, k, v) => { labels[k] = v; return ""; });
+  return [key.slice(0, i), labels];
+}
+function snapsOf(stats, service) {
+  const all = [stats.gateway, ...Object.values(stats.nodes || {})];
+  return all.filter((s) => s && s.counters && (!service || s.service === service));
+}
+const matches = (labels, filter) => Object.entries(filter).every(([k, v]) => labels[k] === v);
+function counter(list, name, filter = {}) {
+  let total = 0;
+  for (const s of list) for (const [k, v] of Object.entries(s.counters || {})) {
+    const [n, l] = parseKey(k);
+    if (n === name && matches(l, filter)) total += v;
+  }
+  return total;
+}
+function gaugeMax(list, name) {
+  let m = 0;
+  for (const s of list) for (const [k, v] of Object.entries(s.gauges || {})) if (parseKey(k)[0] === name) m = Math.max(m, v);
+  return m;
+}
+function histMerge(list, name, filter = {}) {
+  let m = null;
+  for (const s of list) for (const [k, h] of Object.entries(s.histograms || {})) {
+    const [n, l] = parseKey(k);
+    if (n !== name || !matches(l, filter)) continue;
+    if (!m) m = { bounds: h.bounds, counts: h.counts.map(() => 0) };
+    h.counts.forEach((c, i) => { m.counts[i] += c; });
+  }
+  return m;
+}
+function quantile(bounds, counts, q) {
+  const total = counts.reduce((a, b) => a + b, 0);
+  if (total <= 0) return null;
+  const rank = q * total;
+  let cum = 0;
+  for (let i = 0; i < counts.length; i++) {
+    const c = counts[i];
+    if (c && cum + c >= rank) {
+      if (i === bounds.length) return bounds[bounds.length - 1];
+      const lower = i > 0 ? bounds[i - 1] : 0;
+      return lower + (bounds[i] - lower) * (rank - cum) / c;
+    }
+    cum += c;
+  }
+  return bounds[bounds.length - 1];
+}
+
+function totalsFrom(stats) {
+  const gw = snapsOf(stats, "gateway"), pay = snapsOf(stats, "payment-service"), acc = snapsOf(stats, "account-service");
+  const wk = snapsOf(stats, "worker");
+  const bankCalls = counter(wk, "bank_calls_total");
+  return {
+    fwd: counter(gw, "gw_requests_total", { outcome: "proxied" }),
+    reads: counter(gw, "gw_requests_total", { outcome: "proxied", route: "accounts" }) + counter(gw, "gw_requests_total", { outcome: "proxied", route: "vpa" }),
+    rl: counter(gw, "gw_requests_total", { outcome: "rate_limited" }),
+    rlClient: counter(gw, "gw_rate_limited_total", { scope: "client" }),
+    rlGlobal: counter(gw, "gw_rate_limited_total", { scope: "global" }),
+    rejected: counter(gw, "gw_requests_total", { outcome: "rejected" }),
+    upErr: counter(gw, "gw_requests_total", { outcome: "upstream_error" }),
+    created: counter(pay, "payments_created_total"),
+    ok: counter(wk, "payments_processed_total", { status: "SUCCESS" }),
+    failed: counter(wk, "payments_processed_total", { status: "FAILED" }),
+    bankCalls,
+    bankFail: Math.max(0, bankCalls - counter(wk, "bank_calls_total", { outcome: "approved" }) - counter(wk, "bank_calls_total", { outcome: "declined" })),
+    retries: counter(wk, "bank_retries_total"),
+    deferred: counter(wk, "payments_deferred_total"),
+    hit: counter([...pay, ...acc], "cache_requests_total", { result: "hit" }),
+    miss: counter([...pay, ...acc], "cache_requests_total", { result: "miss" }),
+    hist: histMerge(gw, "gw_latency_ms", { outcome: "proxied" }),
+    queue: gaugeMax(wk, "queue_pending") + gaugeMax(wk, "queue_lag"),
+    dlq: gaugeMax(wk, "queue_dead_letters"),
+  };
+}
+
+// ------------------------------------------------------------------ http
+async function api(method, path, body, headers = {}) {
+  const t0 = performance.now();
+  try {
+    const init = { method, headers: { ...headers }, cache: "no-store" };
+    if (body !== undefined) { init.headers["Content-Type"] = "application/json"; init.body = JSON.stringify(body); }
+    const r = await fetch(path, init);
+    let data = null;
+    try { data = await r.json(); } catch (_) { /* not JSON */ }
+    return { status: r.status, headers: r.headers, data, ms: performance.now() - t0 };
+  } catch (e) {
+    return { status: 0, headers: new Headers(), data: null, ms: performance.now() - t0, error: String(e) };
+  }
+}
+const newKey = () => (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : (Date.now().toString(16) + Math.random().toString(16).slice(2)).slice(0, 32));
+
+// ------------------------------------------------------------------ event log
+function logEvent(level, html) {
+  const box = $("log");
+  const [cls, glyph] = { good: ["good", "✓"], warn: ["warning", "!"], bad: ["critical", "✕"], info: ["info", "i"] }[level] || ["neutral", "•"];
+  const row = document.createElement("div");
+  row.innerHTML = `<span class="t">${clock()}</span><span class="ic ${cls}">${glyph}</span><span>${html}</span>`;
+  box.prepend(row);
+  while (box.children.length > 80) box.lastChild.remove();
+}
+
+// ------------------------------------------------------------------ charts (inline SVG, crosshair + tooltip)
+function niceMax(v) {
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+function drawChart(el, series, opts = {}) {
+  const W = Math.max(260, el.clientWidth), H = el.clientHeight || 190;
+  const pad = { l: 40, r: 64, t: 10, b: 22 };
+  const n = HISTORY;
+  const pts = ST.history;
+  const maxV = niceMax(Math.max(opts.minMax || 1, ...series.flatMap((s) => pts.map((p) => p[s.key] ?? 0))) * 1.08);
+  const x = (i) => pad.l + (W - pad.l - pad.r) * (i + (n - pts.length)) / (n - 1);
+  const y = (v) => pad.t + (H - pad.t - pad.b) * (1 - v / maxV);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;
+  for (const f of [0, 0.5, 1]) {
+    const yy = y(maxV * f);
+    svg += `<line class="gridline" x1="${pad.l}" x2="${W - pad.r}" y1="${yy}" y2="${yy}"/>`;
+    svg += `<text class="axis-label" x="${pad.l - 6}" y="${yy + 4}" text-anchor="end">${fmtRate(maxV * f)}</text>`;
+  }
+  for (const [label, secsAgo] of [["−3 min", 180], ["−2 min", 120], ["−1 min", 60], ["now", 0]]) {
+    const i = n - 1 - secsAgo / (POLL_MS / 1000);
+    if (i < 0) continue;
+    const xx = pad.l + (W - pad.l - pad.r) * i / (n - 1);
+    svg += `<text class="axis-label" x="${xx}" y="${H - 5}" text-anchor="${secsAgo === 0 ? "end" : "middle"}">${label}</text>`;
+  }
+  const labelYs = [];
+  for (const s of series) {
+    if (pts.length < 2) continue;
+    const d = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[s.key] ?? 0).toFixed(1)}`).join("");
+    svg += `<path class="series" d="${d}" stroke="${s.color}"/>`;
+    const last = pts[pts.length - 1][s.key] ?? 0;
+    const lx = x(pts.length - 1), ly = y(last);
+    svg += `<circle cx="${lx}" cy="${ly}" r="4" fill="${s.color}" stroke="var(--panel)" stroke-width="2"/>`;
+    let ty = ly + 4;
+    for (const prev of labelYs) if (Math.abs(prev - ty) < 13) ty = prev + (ty >= prev ? 13 : -13);
+    labelYs.push(ty);
+    svg += `<text class="end-label" x="${lx + 8}" y="${ty}">${fmtRate(last)}${s.short ? " " + s.short : ""}</text>`;
+  }
+  svg += `<line class="crosshair" id="${el.id}-x" x1="0" x2="0" y1="${pad.t}" y2="${H - pad.b}" style="display:none"/>`;
+  svg += `<rect x="${pad.l}" y="${pad.t}" width="${W - pad.l - pad.r}" height="${H - pad.t - pad.b}" fill="transparent" class="hit"/>`;
+  svg += `</svg><div class="tooltip"></div>`;
+  el.innerHTML = svg;
+  if (pts.length < 2) el.insertAdjacentHTML("beforeend", `<div class="empty" style="position:absolute;inset:40% 0 auto">collecting data…</div>`);
+  const hit = el.querySelector(".hit"), tip = el.querySelector(".tooltip"), cross = el.querySelector(".crosshair");
+  hit.addEventListener("mousemove", (ev) => {
+    const box = el.getBoundingClientRect();
+    const mx = (ev.clientX - box.left) * (W / box.width);
+    let idx = Math.round((mx - pad.l) / ((W - pad.l - pad.r) / (n - 1))) - (n - pts.length);
+    idx = Math.max(0, Math.min(pts.length - 1, idx));
+    const p = pts[idx];
+    if (!p) return;
+    const cx = x(idx);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.style.display = "";
+    tip.innerHTML = `<div class="muted">${clock(new Date(p.t))}</div>` + series.map((s) =>
+      `<div><i style="background:${s.color}"></i>${esc(s.name)}: <b>${fmtRate(p[s.key] ?? 0)}</b></div>`).join("");
+    tip.style.display = "block";
+    const px = cx * (box.width / W);
+    tip.style.left = Math.min(px + 12, box.width - tip.offsetWidth - 4) + "px";
+    tip.style.top = "8px";
+  });
+  hit.addEventListener("mouseleave", () => { tip.style.display = "none"; cross.style.display = "none"; });
+}
+function drawCharts() {
+  drawChart($("c-throughput"), [
+    { key: "fwd", name: "Forwarded", color: "var(--series-fwd)" },
+    { key: "rl", name: "Rejected (429)", color: "var(--series-rl)", short: "429" },
+  ]);
+  drawChart($("c-queue"), [{ key: "queue", name: "Waiting payments", color: "var(--series-queue)" }], { minMax: 5 });
+  drawChart($("c-done"), [{ key: "done", name: "Settled per second", color: "var(--series-done)" }]);
+}
+
+// ------------------------------------------------------------------ rendering
+function setArrow(id, mode) {
+  const el = $(id);
+  el.classList.toggle("active", mode === "active");
+  el.classList.toggle("broken", mode === "broken");
+}
+function nodesHtml(health, names) {
+  return names.map((name) => {
+    const n = (health.nodes || []).find((x) => x.node === name);
+    const st = n ? n.status : "UNKNOWN";
+    const extra = n && n.circuit_breaker ? ` · bank breaker ${n.circuit_breaker.state}` : "";
+    return `<span title="${esc(name)}: ${esc(st)}${esc(extra)}"><span class="dot" style="background:${dotColor(st)}"></span>${esc(name)}</span>`;
+  }).join("");
+}
+
+function renderHealth(health) {
+  const ov = health.status || "UNKNOWN";
+  $("overall").outerHTML = `<span id="overall">${pill(ov, "System " + ov)}</span>`;
+  const limiter = health.rate_limiter ? health.rate_limiter.backend : "–";
+  $("m-limiter").textContent = limiter;
+  const bankNode = (health.nodes || []).find((n) => n.service === "bank-mock");
+  const mode = bankNode && bankNode.chaos ? bankNode.chaos.mode : null;
+  if (mode) setBankMode(mode, false);
+
+  // node table
+  const rows = (health.nodes || []).map((n) => {
+    const circuit = n.circuit_breaker ? n.circuit_breaker.state : n.circuit.state;
+    const circuitLabel = n.circuit_breaker ? `bank ${circuit}` : circuit;
+    const sub = n.service === "worker" && n.queue ? `<div class="muted" style="font-size:11.5px">queue ${n.queue.length ?? "–"} · pending ${n.queue.pending ?? "–"}</div>` :
+      (n.service === "bank-mock" && n.chaos ? `<div class="muted" style="font-size:11.5px">mode ${esc(n.chaos.mode)}</div>` : "");
+    return `<tr><td class="wrap"><b style="white-space:nowrap">${esc(n.node)}</b><div class="muted" style="font-size:11.5px">${esc(n.service)} · ${n.role === "routed" ? "gets traffic" : "monitored"}</div>${sub}</td>
+      <td>${pill(n.status)}</td><td>${pill(circuit, circuitLabel)}</td><td class="num">${fmtMs(n.health_check_latency_ms)} ms</td></tr>`;
+  }).join("");
+  $("nodes").innerHTML = rows || `<tr><td colspan="4" class="empty">no nodes</td></tr>`;
+
+  // detect changes -> event log
+  const changes = [];
+  for (const n of health.nodes || []) {
+    const now = { status: n.status, circuit: n.circuit.state, bank: n.circuit_breaker ? n.circuit_breaker.state : null };
+    const before = ST.nodeState[n.node];
+    ST.nodeState[n.node] = now;
+    if (!before || ST.firstHealth) continue;
+    if (before.status !== now.status)
+      changes.push([now.status === "UP" ? "good" : (now.status === "DOWN" ? "bad" : "warn"), `<b>${esc(n.node)}</b> health ${esc(before.status)} → <b>${esc(now.status)}</b>`]);
+    if (before.circuit !== now.circuit)
+      changes.push([now.circuit === "CLOSED" ? "good" : (now.circuit === "OPEN" ? "bad" : "warn"), `Gateway circuit for <b>${esc(n.node)}</b> ${esc(before.circuit)} → <b>${esc(now.circuit)}</b>`]);
+    if (now.bank && before.bank && before.bank !== now.bank)
+      changes.push([now.bank === "CLOSED" ? "good" : (now.bank === "OPEN" ? "bad" : "warn"),
+        `<b>${esc(n.node)}</b>: circuit breaker to the bank ${esc(before.bank)} → <b>${esc(now.bank)}</b>` +
+        (now.bank === "OPEN" ? " - stops calling the bank, payments wait in the queue" : now.bank === "HALF_OPEN" ? " - trying one test call" : " - bank calls resume")]);
+  }
+  if (!ST.firstHealth && ST.overall && ST.overall !== ov)
+    changes.push([ov === "UP" ? "good" : (ov === "DOWN" ? "bad" : "warn"), `System status ${esc(ST.overall)} → <b>${esc(ov)}</b>`]);
+  if (!ST.firstHealth && ST.limiter && ST.limiter !== limiter)
+    changes.push([limiter === "redis" ? "good" : "warn", `Rate limiter now uses <b>${esc(limiter)}</b> buckets` + (limiter === "local" ? " (Redis unreachable - in-memory fallback)" : "")]);
+  ST.overall = ov; ST.limiter = limiter; ST.firstHealth = false;
+  changes.forEach(([lvl, html]) => logEvent(lvl, html));
+  return health;
+}
+
+function renderStats(stats, health, summary) {
+  const now = Date.now();
+  const cur = totalsFrom(stats);
+  const prev = ST.prev;
+  let r = null;
+  if (prev) {
+    const dt = Math.max(0.5, (now - prev.at) / 1000);
+    const d = (k) => Math.max(0, cur[k] - prev.t[k]) / dt;
+    let p95 = null;
+    if (cur.hist && prev.t.hist && cur.hist.counts.length === prev.t.hist.counts.length) {
+      const diff = cur.hist.counts.map((c, i) => Math.max(0, c - prev.t.hist.counts[i]));
+      p95 = quantile(cur.hist.bounds, diff, 0.95);
+    }
+    const dh = Math.max(0, cur.hit - prev.t.hit), dm = Math.max(0, cur.miss - prev.t.miss);
+    r = {
+      fwd: d("fwd"), reads: d("reads"), rl: d("rl"), rlClient: d("rlClient"), rlGlobal: d("rlGlobal"), rejected: d("rejected"), upErr: d("upErr"),
+      created: d("created"), ok: d("ok"), failed: d("failed"), bank: d("bankCalls"), bankFail: d("bankFail"),
+      retries: d("retries"), deferred: d("deferred"), p95,
+      cacheWindow: dh + dm >= 5 ? dh / (dh + dm) : null,
+    };
+    ST.history.push({ t: now, fwd: r.fwd, rl: r.rl, queue: cur.queue, done: r.ok + r.failed });
+    if (ST.history.length > HISTORY) ST.history.shift();
+  }
+  ST.prev = { at: now, t: cur };
+
+  const cacheAll = cur.hit + cur.miss > 0 ? cur.hit / (cur.hit + cur.miss) : null;
+  const cache = r && r.cacheWindow != null ? r.cacheWindow : cacheAll;
+  const workers = (health.nodes || []).filter((n) => n.service === "worker");
+  const breaker = workers.map((n) => n.circuit_breaker && n.circuit_breaker.state).filter(Boolean);
+  const worstBreaker = breaker.includes("OPEN") ? "OPEN" : breaker.includes("HALF_OPEN") ? "HALF_OPEN" : (breaker.length ? "CLOSED" : null);
+
+  // KPI tiles
+  $("k-fwd").innerHTML = r ? `${fmtRate(r.fwd)}<small>/s</small>` : "–";
+  $("k-rl").innerHTML = r ? `${fmtRate(r.rl)}<small>/s</small>` : "–";
+  $("k-rl-note").textContent = r && r.rl > 0 ? `per phone ${fmtRate(r.rlClient)}/s · global ${fmtRate(r.rlGlobal)}/s` : "429 Too Many Requests, per second";
+  $("k-p95").innerHTML = r && r.p95 != null ? `${fmtMs(r.p95)}<small>ms</small>` : (r ? `–<small>no traffic</small>` : "–");
+  $("k-cache").innerHTML = cache != null ? `${Math.round(cache * 100)}<small>%</small>` : "–";
+  $("k-cache-note").textContent = `${fmtInt(cur.hit)} hits · ${fmtInt(cur.miss)} misses (all time)`;
+  $("k-queue").textContent = fmtInt(cur.queue);
+  $("k-queue-note").textContent = cur.dlq ? `dead-letter queue: ${fmtInt(cur.dlq)}` : "Redis Stream: pending + not yet read";
+  if (summary) {
+    const bs = summary.by_status || {};
+    const ok = (bs.SUCCESS || {}).count || 0, failed = (bs.FAILED || {}).count || 0;
+    const waiting = ((bs.PENDING || {}).count || 0) + ((bs.PROCESSING || {}).count || 0);
+    $("k-pay").innerHTML = `${fmtInt(ok)}<small>/ ${fmtInt(failed)}</small>`;
+    $("k-pay-note").textContent = `${fmtInt(waiting)} in progress · ${fmtInt(summary.total_transactions)} total`;
+  }
+
+  // pipeline
+  const total = r ? r.fwd + r.rl + r.rejected + r.upErr : null;
+  $("pv-clients").textContent = fmtRate(total);
+  $("pv-gw").textContent = r ? fmtRate(r.fwd) : "–";
+  $("ps-gw").innerHTML = r ? `429: <b>${fmtRate(r.rl)}/s</b>${r.upErr ? ` · errors ${fmtRate(r.upErr)}/s` : ""}` : "";
+  $("pn-gateway").innerHTML = `<span><span class="dot" style="background:${dotColor("UP")}"></span>gateway</span>` +
+    `<span><span class="dot" style="background:${dotColor(health.rate_limiter && health.rate_limiter.redis)}"></span>redis</span>`;
+  $("pv-svc").textContent = r ? fmtRate(r.created) : "–";
+  $("ps-svc").innerHTML = r ? `reads ${fmtRate(r.reads)}/s · cache hit ${cache != null ? Math.round(cache * 100) + "%" : "–"}` : "";
+  $("pn-services").innerHTML = nodesHtml(health, ["payment-service-1", "payment-service-2", "account-service"]);
+  $("pv-queue").textContent = fmtInt(cur.queue);
+  $("ps-queue").innerHTML = `dead letters ${fmtInt(cur.dlq)}`;
+  $("pv-workers").textContent = r ? fmtRate(r.ok + r.failed) : "–";
+  $("ps-workers").innerHTML = r ? `retries ${fmtRate(r.retries)}/s · deferred ${fmtRate(r.deferred)}/s` : "";
+  $("pn-workers").innerHTML = nodesHtml(health, ["worker-1", "worker-2"]) + (worstBreaker ? `<span>bank breaker ${pill(worstBreaker)}</span>` : "");
+  $("pv-bank").textContent = r ? fmtRate(r.bank) : "–";
+  $("ps-bank").innerHTML = `mode <b>${esc(ST.bankMode || "–")}</b>` + (r && r.bankFail ? ` · failing ${fmtRate(r.bankFail)}/s` : "");
+  if (summary) {
+    if (ST.moneyBaseline == null) ST.moneyBaseline = summary.money_in_system_paise;
+    $("pv-db").textContent = rupees(summary.money_in_system_paise);
+    const same = summary.money_in_system_paise === ST.moneyBaseline;
+    $("ps-db").innerHTML = same ? `${pill("SUCCESS", "unchanged")} money is never created or lost` : `${pill("FAILED", "changed")} since the page opened`;
+  }
+
+  // stage borders + arrows
+  $("st-gateway").className = "stage" + (health.status === "DOWN" ? " bad" : "");
+  $("st-workers").className = "stage" + (worstBreaker === "OPEN" ? " bad" : worstBreaker === "HALF_OPEN" ? " warn" : "");
+  $("st-bank").className = "stage" + (ST.bankMode === "down" ? " bad" : (ST.bankMode === "flaky" || ST.bankMode === "slow") ? " warn" : "");
+  $("st-queue").className = "stage" + (cur.queue > 50 ? " warn" : "");
+  if (r) {
+    setArrow("ar-1", total > 0 ? "active" : "idle");
+    setArrow("ar-2", r.fwd > 0 ? (r.upErr > 0 ? "broken" : "active") : "idle");
+    setArrow("ar-3", r.created > 0 ? "active" : "idle");
+    setArrow("ar-4", (r.ok + r.failed) > 0 || r.deferred > 0 ? "active" : "idle");
+    setArrow("ar-5", worstBreaker === "OPEN" || (r.bankFail > 0 && r.bankFail >= r.bank / 2) ? "broken" : (r.bank > 0 ? "active" : "idle"));
+    setArrow("ar-6", (r.ok + r.failed) > 0 ? "active" : "idle");
+  }
+  drawCharts();
+}
+
+function renderTransactions(data) {
+  const list = (data && data.transactions) || [];
+  if (!list.length) return;
+  const first = ST.seenTx.size === 0;
+  $("txs").innerHTML = list.map((t) => {
+    const isNew = !first && !ST.seenTx.has(t.txn_id);
+    const detail = t.failure_reason || t.bank_ref || "";
+    return `<tr class="click${isNew ? " new" : ""}${ST.selected === t.txn_id ? " sel" : ""}" data-id="${esc(t.txn_id)}">
+      <td class="muted">${clock(new Date(t.created_at))}</td>
+      <td class="mono">${esc(shortId(t.txn_id))}</td>
+      <td>${esc(t.payer_vpa)} <span class="muted">→</span> ${esc(t.payee_vpa)}</td>
+      <td class="num">${rupees(t.amount_paise)}</td>
+      <td>${pill(t.status)}</td>
+      <td class="mono muted wrap" style="font-size:12px">${esc(detail)}</td>
+      <td class="num">${t.attempts}</td></tr>`;
+  }).join("");
+  list.forEach((t) => ST.seenTx.add(t.txn_id));
+  if (ST.seenTx.size > 5000) ST.seenTx = new Set(list.map((t) => t.txn_id));
+  $("tx-count").textContent = `latest ${list.length}`;
+}
+
+async function showDetail(txnId, quiet = false) {
+  ST.selected = txnId;
+  document.querySelectorAll("#txs tr").forEach((tr) => tr.classList.toggle("sel", tr.dataset.id === txnId));
+  const res = await api("GET", `/dashboard/api/transactions/${encodeURIComponent(txnId)}/events`);
+  if (ST.selected !== txnId) return;
+  if (res.status !== 200 || !res.data) {
+    if (!quiet) { $("detail-empty").style.display = ""; $("detail-empty").textContent = "Could not load this transaction."; $("detail-body").style.display = "none"; }
+    return;
+  }
+  const { transaction: t, events } = res.data;
+  ST.selectedFinal = t.status === "SUCCESS" || t.status === "FAILED";
+  const t0 = events.length ? new Date(events[0].at).getTime() : new Date(t.created_at).getTime();
+  const what = (e) => {
+    const d = e.detail || {};
+    if (e.to === "PENDING" && !e.from) return `Payment accepted by <b>${esc(e.actor)}</b> and saved as PENDING, then put on the queue`;
+    if (e.to === "PROCESSING") return `Picked from the queue by <b>${esc(e.actor)}</b>${d.reclaimed ? " (re-delivered after a failure)" : ""}; worker claims it so no one else can`;
+    if (e.to === "PENDING") return `<b>${esc(e.actor)}</b> put it back on the queue: ${esc(d.reason || "")}${d.breaker_retry_in_s != null ? ` (circuit open, retry in ${esc(d.breaker_retry_in_s)} s)` : ""}`;
+    if (e.to === "SUCCESS") return `Bank approved (${esc(d.bank_ref || "")}); <b>${esc(e.actor)}</b> debited, credited and wrote 2 ledger entries in one database transaction`;
+    if (e.to === "FAILED") return `Ended as FAILED by <b>${esc(e.actor)}</b>: ${esc(d.reason || "")}`;
+    return `${esc(e.from || "")} → ${esc(e.to)} by ${esc(e.actor)}`;
+  };
+  const steps = events.map((e) => {
+    const ms = new Date(e.at).getTime() - t0;
+    const [cls, glyph] = STATUS_STYLE[e.to] || ["neutral", "•"];
+    return `<li><span class="ic ${cls}">${glyph}</span>
+      <div><b>${esc(e.to)}</b> <span class="when">+${ms.toLocaleString("en-IN")} ms · ${clock(new Date(e.at))}</span></div>
+      <div style="font-size:13px">${what(e)}</div></li>`;
+  }).join("");
+  const rid = t.request_id || "";
+  $("detail-empty").style.display = "none";
+  $("detail-body").style.display = "";
+  $("detail-body").innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span class="mono">${esc(t.txn_id)}</span>${pill(t.status)}</div>
+    <div class="kv">
+      <div>From</div><div>${esc(t.payer_vpa)}</div>
+      <div>To</div><div>${esc(t.payee_vpa)}</div>
+      <div>Amount</div><div>${rupees(t.amount_paise)}${t.note ? ` <span class="muted">· ${esc(t.note)}</span>` : ""}</div>
+      <div>Bank tries</div><div>${t.attempts}</div>
+      <div>Request ID</div><div><span class="mono">${esc(rid)}</span>${rid ? `<button class="copy" data-copy="python scripts/demo.py trace ${esc(rid)}">copy trace command</button>` : ""}</div>
+    </div>
+    <ul class="trail">${steps || '<li class="muted">no events yet</li>'}</ul>`;
+}
+
+// ------------------------------------------------------------------ actions
+const PAIR = [["alice@okaxis", "bob@oksbi"], ["bob@oksbi", "alice@okaxis"]];
+function nextPair() { ST.dir = 1 - ST.dir; return PAIR[ST.dir]; }
+
+async function sendPayment(amount, key, payer, payee, clientId = "dashboard") {
+  return api("POST", "/api/v1/payments",
+    { payer_vpa: payer, payee_vpa: payee, amount, note: "dashboard demo" },
+    { "X-Client-ID": clientId, "Idempotency-Key": key });
+}
+function describePay(res) {
+  if (res.status === 202) return `<b>202 Accepted</b> in ${fmtMs(res.ms)} ms via ${esc(res.headers.get("X-Upstream-Node") || "?")} · txn <span class="mono">${esc(shortId(res.data.txn_id))}</span>`;
+  if (res.status === 200 && res.headers.get("Idempotent-Replay") === "true") return `<b>200 Idempotent-Replay</b> - same txn <span class="mono">${esc(shortId(res.data.txn_id))}</span>, no second debit`;
+  if (res.status === 429) return `<b>429</b> rate limited (Retry-After ${esc(res.headers.get("Retry-After"))} s)`;
+  return `<b>HTTP ${res.status}</b> ${esc((res.data && (res.data.message || res.data.error)) || res.error || "")}`;
+}
+
+$("b-pay").onclick = async () => {
+  const [payer, payee] = nextPair();
+  const amount = `${10 + Math.floor(Math.random() * 490)}.00`;
+  const res = await sendPayment(amount, newKey(), payer, payee);
+  logEvent(res.status === 202 ? "good" : "bad", `Payment ₹${amount} ${payer} → ${payee}: ${describePay(res)}`);
+  if (res.status === 202) { await refreshTransactions(); showDetail(res.data.txn_id); }
+};
+$("b-twice").onclick = async () => {
+  const [payer, payee] = nextPair();
+  const key = newKey(), amount = "75.00";
+  const a = await sendPayment(amount, key, payer, payee);
+  const b = await sendPayment(amount, key, payer, payee);
+  const same = a.data && b.data && a.data.txn_id === b.data.txn_id;
+  logEvent(same ? "good" : "warn", `Same Idempotency-Key sent twice (₹${amount}): 1st ${describePay(a)}; 2nd ${describePay(b)}`);
+  if (a.status === 202) { await refreshTransactions(); showDetail(a.data.txn_id); }
+};
+$("b-decline").onclick = async () => {
+  const [payer, payee] = nextPair();
+  const res = await sendPayment("1.13", newKey(), payer, payee);
+  logEvent(res.status === 202 ? "info" : "bad", `Payment ₹1.13 (the mock bank declines amounts ending in .13): ${describePay(res)}`);
+  if (res.status === 202) { await refreshTransactions(); showDetail(res.data.txn_id); }
+};
+$("b-flood").onclick = async () => {
+  const client = "flood-" + Math.random().toString(16).slice(2, 8);
+  const t0 = performance.now();
+  const results = await Promise.all(Array.from({ length: 80 }, () =>
+    api("GET", "/api/v1/vpa/bob@oksbi", undefined, { "X-Client-ID": client })));
+  const ok = results.filter((r) => r.status === 200).length;
+  const limited = results.filter((r) => r.status === 429);
+  const other = results.length - ok - limited.length;
+  const ra = limited.length ? limited[0].headers.get("Retry-After") : null;
+  logEvent(limited.length ? "warn" : "info",
+    `Flood: 80 requests from one phone in ${fmtMs(performance.now() - t0)} ms → <b>${ok} allowed</b>, <b>${limited.length} rejected with 429</b>` +
+    (ra ? ` (Retry-After ${esc(ra)} s)` : "") + (other ? `, ${other} other` : "") + ". Other phones are not affected.");
+};
+
+function setBankMode(mode, fromUser) {
+  if (ST.bankMode && ST.bankMode !== mode && !fromUser)
+    logEvent(mode === "normal" ? "good" : "warn", `Bank mode changed to <b>${esc(mode)}</b>`);
+  ST.bankMode = mode;
+  $("m-bank").textContent = mode;
+  document.querySelectorAll("#seg-bank button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.v === mode);
+    b.classList.toggle("danger", b.dataset.v === mode && mode !== "normal");
+  });
+}
+document.querySelectorAll("#seg-bank button").forEach((b) => {
+  b.onclick = async () => {
+    const res = await api("POST", "/dashboard/api/chaos", { mode: b.dataset.v });
+    if (res.status === 200) {
+      setBankMode(b.dataset.v, true);
+      const what = { normal: "healthy again - the circuit breaker will test it and close",
+        flaky: "fails 50% of calls - watch retries with exponential backoff",
+        slow: "takes 1.5-2.5 s per call - workers time out after 1 s and retry",
+        down: "rejects every call - after 5 failures the circuit breaker opens" }[b.dataset.v];
+      logEvent(b.dataset.v === "normal" ? "good" : "warn", `Bank switched to <b>${esc(b.dataset.v)}</b>: ${what}`);
+    } else {
+      logEvent("bad", `Could not change the bank mode (HTTP ${res.status})`);
+    }
+  };
+});
+
+// simulated users from the browser
+const TRAFFIC = { off: null, light: { reads: 6, pays: 1 }, heavy: { reads: 42, pays: 8 } };
+let acc = { reads: 0, pays: 0 };
+const simVpa = () => `user${String(1 + Math.floor(Math.random() * 1000)).padStart(4, "0")}@mockbank`;
+const simClient = () => `sim-phone-${Math.floor(Math.random() * 300)}`;
+setInterval(() => {
+  const t = TRAFFIC[ST.traffic];
+  if (!t || document.hidden) return;
+  acc.reads += t.reads / 10; acc.pays += t.pays / 10;
+  while (acc.reads >= 1) {
+    acc.reads -= 1;
+    const path = Math.random() < 0.6 ? `/api/v1/accounts/${simVpa()}/balance` : `/api/v1/vpa/${simVpa()}`;
+    api("GET", path, undefined, { "X-Client-ID": simClient() });
+  }
+  while (acc.pays >= 1) {
+    acc.pays -= 1;
+    let payer = simVpa(), payee = simVpa();
+    while (payee === payer) payee = simVpa();
+    sendPayment(`${1 + Math.floor(Math.random() * 200)}.00`, newKey(), payer, payee, simClient());
+  }
+}, 100);
+document.querySelectorAll("#seg-traffic button").forEach((b) => {
+  b.onclick = () => {
+    ST.traffic = b.dataset.v;
+    document.querySelectorAll("#seg-traffic button").forEach((x) => x.classList.toggle("on", x === b));
+    logEvent("info", ST.traffic === "off" ? "Simulated users stopped" : `Simulated users started: <b>${esc(b.textContent)}</b> (random user0001…user1000 accounts)`);
+  };
+});
+
+// clicks inside tables / copy buttons
+$("txs").addEventListener("click", (ev) => {
+  const tr = ev.target.closest("tr[data-id]");
+  if (tr) showDetail(tr.dataset.id);
+});
+$("detail").addEventListener("click", async (ev) => {
+  const btn = ev.target.closest("button[data-copy]");
+  if (!btn) return;
+  try { await navigator.clipboard.writeText(btn.dataset.copy); btn.textContent = "copied ✓"; }
+  catch (_) { window.prompt("Copy this command:", btn.dataset.copy); }
+});
+
+// ------------------------------------------------------------------ polling loop
+async function refreshTransactions() {
+  const res = await api("GET", "/dashboard/api/transactions?limit=20");
+  if (res.status === 200) renderTransactions(res.data);
+}
+async function poll() {
+  const [h, s, sum, tx] = await Promise.all([
+    api("GET", "/health"), api("GET", "/stats"), api("GET", "/dashboard/api/summary"), api("GET", "/dashboard/api/transactions?limit=20"),
+  ]);
+  const banner = $("banner");
+  if (!h.data || !s.data || h.status === 0 || s.status !== 200) {
+    ST.failures += 1;
+    banner.classList.add("show");
+    banner.innerHTML = `<b>Gateway not reachable.</b> Is the system running? In Command Prompt: <span class="mono">docker compose up -d</span> (retrying every 2 s)`;
+    $("overall").outerHTML = `<span id="overall">${pill("DOWN", "Gateway unreachable")}</span>`;
+    return;
+  }
+  ST.failures = 0;
+  banner.classList.remove("show");
+  const health = renderHealth(h.data);
+  renderStats(s.data, health, sum.status === 200 ? sum.data : null);
+  if (tx.status === 200) renderTransactions(tx.data);
+  if (ST.selected && !ST.selectedFinal) showDetail(ST.selected, true);
+  $("m-updated").textContent = clock();
+}
+async function loop() {
+  try { await poll(); } catch (e) { console.error(e); }
+  setTimeout(loop, POLL_MS);
+}
+window.addEventListener("resize", () => drawCharts());
+logEvent("info", "Dashboard opened - polling the gateway every 2 seconds");
+drawCharts();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,3972 @@
+{
+ "runs": [
+  {
+   "label": "scale-u100",
+   "users": 100,
+   "variant": "",
+   "limiter": "on",
+   "server_metrics_partial": false,
+   "load_s": 65.1,
+   "queue_drain_s": 0.2,
+   "host": {
+    "os": "Windows 11",
+    "cpus": 12,
+    "python": "3.13.3"
+   },
+   "client": {
+    "requests": 8082,
+    "failures": 697,
+    "rps": 137.8676814184921,
+    "p50": 11.0,
+    "p95": 270.0,
+    "p99": 650.0,
+    "avg": 51.484451154788395,
+    "max": 1830.293002000005,
+    "rate_limited": 697,
+    "other_failures": 0,
+    "failures_by_error": {
+     "CatchResponseError('429 RATE_LIMITED')": 697
+    },
+    "ok_rps": 113.4
+   },
+   "endpoints": [
+    {
+     "name": "GET /accounts/[vpa]/balance",
+     "requests": 1949,
+     "failures": 0,
+     "rps": 33.24722978033174,
+     "p50": 13.0,
+     "p95": 440.0,
+     "p99": 800.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/balance (abusive client)",
+     "requests": 2997,
+     "failures": 697,
+     "rps": 51.12465246365019,
+     "p50": 7.0,
+     "p95": 50.0,
+     "p99": 270.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/transactions",
+     "requests": 210,
+     "failures": 0,
+     "rps": 3.5823079804359494,
+     "p50": 15.0,
+     "p95": 400.0,
+     "p99": 890.0
+    },
+    {
+     "name": "GET /payments/[txn_id]",
+     "requests": 679,
+     "failures": 0,
+     "rps": 11.58279580340957,
+     "p50": 13.0,
+     "p95": 250.0,
+     "p99": 480.0
+    },
+    {
+     "name": "GET /vpa/[vpa]",
+     "requests": 1255,
+     "failures": 0,
+     "rps": 21.40855483546246,
+     "p50": 13.0,
+     "p95": 410.0,
+     "p99": 900.0
+    },
+    {
+     "name": "POST /payments",
+     "requests": 992,
+     "failures": 0,
+     "rps": 16.9221405552022,
+     "p50": 21.0,
+     "p95": 240.0,
+     "p99": 430.0
+    }
+   ],
+   "history": [
+    {
+     "t": 0,
+     "users": 0.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": null
+    },
+    {
+     "t": 1,
+     "users": 20.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 0.0
+    },
+    {
+     "t": 2,
+     "users": 40.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 940.0
+    },
+    {
+     "t": 3,
+     "users": 60.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 890.0
+    },
+    {
+     "t": 4,
+     "users": 80.0,
+     "rps": 19.5,
+     "fps": 0.0,
+     "p95": 390.0
+    },
+    {
+     "t": 5,
+     "users": 100.0,
+     "rps": 45.333333,
+     "fps": 0.0,
+     "p95": 360.0
+    },
+    {
+     "t": 6,
+     "users": 100.0,
+     "rps": 61.5,
+     "fps": 0.0,
+     "p95": 690.0
+    },
+    {
+     "t": 7,
+     "users": 100.0,
+     "rps": 73.4,
+     "fps": 0.0,
+     "p95": 570.0
+    },
+    {
+     "t": 8,
+     "users": 100.0,
+     "rps": 73.166667,
+     "fps": 0.0,
+     "p95": 500.0
+    },
+    {
+     "t": 9,
+     "users": 100.0,
+     "rps": 76.285714,
+     "fps": 0.0,
+     "p95": 450.0
+    },
+    {
+     "t": 10,
+     "users": 100.0,
+     "rps": 85.625,
+     "fps": 0.0,
+     "p95": 410.0
+    },
+    {
+     "t": 11,
+     "users": 100.0,
+     "rps": 93.222222,
+     "fps": 0.0,
+     "p95": 320.0
+    },
+    {
+     "t": 12,
+     "users": 100.0,
+     "rps": 100.5,
+     "fps": 0.0,
+     "p95": 340.0
+    },
+    {
+     "t": 13,
+     "users": 100.0,
+     "rps": 113.1,
+     "fps": 1.4,
+     "p95": 320.0
+    },
+    {
+     "t": 14,
+     "users": 100.0,
+     "rps": 119.1,
+     "fps": 1.4,
+     "p95": 320.0
+    },
+    {
+     "t": 15,
+     "users": 100.0,
+     "rps": 120.8,
+     "fps": 1.4,
+     "p95": 290.0
+    },
+    {
+     "t": 16,
+     "users": 100.0,
+     "rps": 126.1,
+     "fps": 1.4,
+     "p95": 180.0
+    },
+    {
+     "t": 17,
+     "users": 100.0,
+     "rps": 137.9,
+     "fps": 3.2,
+     "p95": 180.0
+    },
+    {
+     "t": 18,
+     "users": 100.0,
+     "rps": 146.9,
+     "fps": 7.1,
+     "p95": 180.0
+    },
+    {
+     "t": 19,
+     "users": 100.0,
+     "rps": 145.9,
+     "fps": 8.5,
+     "p95": 180.0
+    },
+    {
+     "t": 20,
+     "users": 100.0,
+     "rps": 145.7,
+     "fps": 10.1,
+     "p95": 150.0
+    },
+    {
+     "t": 21,
+     "users": 100.0,
+     "rps": 145.7,
+     "fps": 12.6,
+     "p95": 160.0
+    },
+    {
+     "t": 22,
+     "users": 100.0,
+     "rps": 142.6,
+     "fps": 11.9,
+     "p95": 180.0
+    },
+    {
+     "t": 23,
+     "users": 100.0,
+     "rps": 145.9,
+     "fps": 11.9,
+     "p95": 260.0
+    },
+    {
+     "t": 24,
+     "users": 100.0,
+     "rps": 146.1,
+     "fps": 11.9,
+     "p95": 270.0
+    },
+    {
+     "t": 25,
+     "users": 100.0,
+     "rps": 139.1,
+     "fps": 11.9,
+     "p95": 270.0
+    },
+    {
+     "t": 26,
+     "users": 100.0,
+     "rps": 140.4,
+     "fps": 11.9,
+     "p95": 270.0
+    },
+    {
+     "t": 27,
+     "users": 100.0,
+     "rps": 140.7,
+     "fps": 10.1,
+     "p95": 260.0
+    },
+    {
+     "t": 28,
+     "users": 100.0,
+     "rps": 138.9,
+     "fps": 8.4,
+     "p95": 280.0
+    },
+    {
+     "t": 29,
+     "users": 100.0,
+     "rps": 141.6,
+     "fps": 11.0,
+     "p95": 370.0
+    },
+    {
+     "t": 30,
+     "users": 100.0,
+     "rps": 139.7,
+     "fps": 11.5,
+     "p95": 320.0
+    },
+    {
+     "t": 31,
+     "users": 100.0,
+     "rps": 133.0,
+     "fps": 9.0,
+     "p95": 300.0
+    },
+    {
+     "t": 32,
+     "users": 100.0,
+     "rps": 134.7,
+     "fps": 8.3,
+     "p95": 210.0
+    },
+    {
+     "t": 33,
+     "users": 100.0,
+     "rps": 137.1,
+     "fps": 8.3,
+     "p95": 190.0
+    },
+    {
+     "t": 34,
+     "users": 100.0,
+     "rps": 141.1,
+     "fps": 8.3,
+     "p95": 190.0
+    },
+    {
+     "t": 35,
+     "users": 100.0,
+     "rps": 148.0,
+     "fps": 9.5,
+     "p95": 190.0
+    },
+    {
+     "t": 36,
+     "users": 100.0,
+     "rps": 149.3,
+     "fps": 12.6,
+     "p95": 190.0
+    },
+    {
+     "t": 37,
+     "users": 100.0,
+     "rps": 148.3,
+     "fps": 15.2,
+     "p95": 180.0
+    },
+    {
+     "t": 38,
+     "users": 100.0,
+     "rps": 150.2,
+     "fps": 17.3,
+     "p95": 68.0
+    },
+    {
+     "t": 39,
+     "users": 100.0,
+     "rps": 150.5,
+     "fps": 17.3,
+     "p95": 230.0
+    },
+    {
+     "t": 40,
+     "users": 100.0,
+     "rps": 153.3,
+     "fps": 18.4,
+     "p95": 400.0
+    },
+    {
+     "t": 41,
+     "users": 100.0,
+     "rps": 149.9,
+     "fps": 18.4,
+     "p95": 480.0
+    },
+    {
+     "t": 42,
+     "users": 100.0,
+     "rps": 145.8,
+     "fps": 18.4,
+     "p95": 480.0
+    },
+    {
+     "t": 43,
+     "users": 100.0,
+     "rps": 140.4,
+     "fps": 18.4,
+     "p95": 480.0
+    },
+    {
+     "t": 44,
+     "users": 100.0,
+     "rps": 139.9,
+     "fps": 18.4,
+     "p95": 480.0
+    },
+    {
+     "t": 45,
+     "users": 100.0,
+     "rps": 140.3,
+     "fps": 17.2,
+     "p95": 480.0
+    },
+    {
+     "t": 46,
+     "users": 100.0,
+     "rps": 139.6,
+     "fps": 14.1,
+     "p95": 480.0
+    },
+    {
+     "t": 47,
+     "users": 100.0,
+     "rps": 140.8,
+     "fps": 15.0,
+     "p95": 480.0
+    },
+    {
+     "t": 48,
+     "users": 100.0,
+     "rps": 136.6,
+     "fps": 12.1,
+     "p95": 440.0
+    },
+    {
+     "t": 49,
+     "users": 100.0,
+     "rps": 135.7,
+     "fps": 10.5,
+     "p95": 270.0
+    },
+    {
+     "t": 50,
+     "users": 100.0,
+     "rps": 135.8,
+     "fps": 10.3,
+     "p95": 47.0
+    },
+    {
+     "t": 51,
+     "users": 100.0,
+     "rps": 146.3,
+     "fps": 13.8,
+     "p95": 78.0
+    },
+    {
+     "t": 52,
+     "users": 100.0,
+     "rps": 154.0,
+     "fps": 16.5,
+     "p95": 130.0
+    },
+    {
+     "t": 53,
+     "users": 100.0,
+     "rps": 160.1,
+     "fps": 18.2,
+     "p95": 130.0
+    },
+    {
+     "t": 54,
+     "users": 100.0,
+     "rps": 154.6,
+     "fps": 18.6,
+     "p95": 130.0
+    },
+    {
+     "t": 55,
+     "users": 100.0,
+     "rps": 151.7,
+     "fps": 18.6,
+     "p95": 130.0
+    }
+   ],
+   "server": {
+    "forwarded": 7447.0,
+    "rate_limited": {
+     "client": 697
+    },
+    "upstream_errors": 0.0,
+    "gateway_ms": {
+     "p50": 9.57,
+     "p95": 294.21,
+     "p99": 771.37,
+     "count": 7447,
+     "mean": 54.96
+    },
+    "upstream_payment_ms": {
+     "p50": 13.62,
+     "p95": 181.44,
+     "p99": 473.45,
+     "count": 1685,
+     "mean": 42.26
+    },
+    "upstream_account_ms": {
+     "p50": 6.49,
+     "p95": 292.29,
+     "p99": 787.98,
+     "count": 5762,
+     "mean": 51.32
+    },
+    "payment_service_ms": {
+     "p50": 6.56,
+     "p95": 36.51,
+     "p99": 69.23,
+     "count": 1685,
+     "mean": 10.51
+    },
+    "account_service_ms": {
+     "p50": 1.07,
+     "p95": 4.78,
+     "p99": 11.4,
+     "count": 5762,
+     "mean": 3.21
+    },
+    "db_query_ms": {
+     "p50": 1.54,
+     "p95": 4.59,
+     "p99": 89.12,
+     "count": 1387,
+     "mean": 6.53
+    },
+    "db_queries": 3277.0,
+    "cache_hit_ratio": 73.1,
+    "cache_hits": 6172,
+    "cache_misses": 2276,
+    "payments_created": 1001.0,
+    "payments_success": 995.0,
+    "payments_failed": 6.0,
+    "settle_per_s": 15.4,
+    "queue_wait_ms": {
+     "p50": 1.48,
+     "p95": 2.88,
+     "p99": 5.93,
+     "count": 1001,
+     "mean": 1.57
+    },
+    "processing_ms": {
+     "p50": 66.27,
+     "p95": 120.99,
+     "p99": 271.36,
+     "count": 1001,
+     "mean": 73.03
+    },
+    "bank_call_ms": {
+     "p50": 45.64,
+     "p95": 72.07,
+     "p99": 74.61,
+     "count": 1019,
+     "mean": 46.01
+    },
+    "txn_e2e_ms": {
+     "p50": 62.19,
+     "p95": 98.71,
+     "p99": 269.62,
+     "count": 995,
+     "mean": 67.45
+    },
+    "queue_pending_max": 5,
+    "queue_lag_max": 0
+   },
+   "timeline": [
+    {
+     "t": 0.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 0.0
+    },
+    {
+     "t": 2.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 0.0
+    },
+    {
+     "t": 4.2,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 1.0,
+     "payments_success": 0.0
+    },
+    {
+     "t": 6.3,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 161.0,
+     "payments_success": 17.0
+    },
+    {
+     "t": 8.4,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 411.0,
+     "payments_success": 50.0
+    },
+    {
+     "t": 10.5,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 608.0,
+     "payments_success": 86.0
+    },
+    {
+     "t": 12.5,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 924.0,
+     "payments_success": 126.0
+    },
+    {
+     "t": 14.7,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 14.0,
+     "gw_requests": 1204.0,
+     "payments_success": 161.0
+    },
+    {
+     "t": 16.8,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 14.0,
+     "gw_requests": 1475.0,
+     "payments_success": 195.0
+    },
+    {
+     "t": 18.8,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 28.0,
+     "gw_requests": 1794.0,
+     "payments_success": 232.0
+    },
+    {
+     "t": 20.9,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 85.0,
+     "gw_requests": 2133.0,
+     "payments_success": 263.0
+    },
+    {
+     "t": 22.9,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 125.0,
+     "gw_requests": 2454.0,
+     "payments_success": 301.0
+    },
+    {
+     "t": 25.0,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 133.0,
+     "gw_requests": 2689.0,
+     "payments_success": 328.0
+    },
+    {
+     "t": 27.1,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 133.0,
+     "gw_requests": 2921.0,
+     "payments_success": 362.0
+    },
+    {
+     "t": 29.1,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 133.0,
+     "gw_requests": 3247.0,
+     "payments_success": 404.0
+    },
+    {
+     "t": 31.2,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 200.0,
+     "gw_requests": 3599.0,
+     "payments_success": 432.0
+    },
+    {
+     "t": 33.3,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 216.0,
+     "gw_requests": 3834.0,
+     "payments_success": 474.0
+    },
+    {
+     "t": 35.4,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 216.0,
+     "gw_requests": 4123.0,
+     "payments_success": 516.0
+    },
+    {
+     "t": 37.4,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 244.0,
+     "gw_requests": 4461.0,
+     "payments_success": 556.0
+    },
+    {
+     "t": 39.5,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 306.0,
+     "gw_requests": 4797.0,
+     "payments_success": 596.0
+    },
+    {
+     "t": 41.5,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 390.0,
+     "gw_requests": 5151.0,
+     "payments_success": 633.0
+    },
+    {
+     "t": 44.8,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 400.0,
+     "gw_requests": 5439.0,
+     "payments_success": 666.0
+    },
+    {
+     "t": 46.9,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 400.0,
+     "gw_requests": 5771.0,
+     "payments_success": 725.0
+    },
+    {
+     "t": 49.0,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 435.0,
+     "gw_requests": 6115.0,
+     "payments_success": 763.0
+    },
+    {
+     "t": 51.0,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 475.0,
+     "gw_requests": 6426.0,
+     "payments_success": 793.0
+    },
+    {
+     "t": 53.0,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 540.0,
+     "gw_requests": 6759.0,
+     "payments_success": 829.0
+    },
+    {
+     "t": 55.2,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 586.0,
+     "gw_requests": 7089.0,
+     "payments_success": 866.0
+    },
+    {
+     "t": 57.3,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 586.0,
+     "gw_requests": 7351.0,
+     "payments_success": 899.0
+    },
+    {
+     "t": 59.3,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 623.0,
+     "gw_requests": 7688.0,
+     "payments_success": 947.0
+    },
+    {
+     "t": 61.4,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 695.0,
+     "gw_requests": 8034.0,
+     "payments_success": 977.0
+    },
+    {
+     "t": 63.4,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8144.0,
+     "payments_success": 995.0
+    }
+   ],
+   "resources": {
+    "account-service": {
+     "cpu_mean": 24.9,
+     "cpu_max": 70.8,
+     "mem_max_mib": 60.3
+    },
+    "bank-mock": {
+     "cpu_mean": 15.6,
+     "cpu_max": 70.5,
+     "mem_max_mib": 53.4
+    },
+    "gateway": {
+     "cpu_mean": 83.2,
+     "cpu_max": 149.4,
+     "mem_max_mib": 64.4
+    },
+    "hotel-graphql-api": {
+     "cpu_mean": 0.0,
+     "cpu_max": 0.0,
+     "mem_max_mib": 20.5
+    },
+    "hotel-rest-api": {
+     "cpu_mean": 0.0,
+     "cpu_max": 0.2,
+     "mem_max_mib": 16.1
+    },
+    "lbdemo_backend1.1.361vdrdfi45n4v14y606ww2nc": {
+     "cpu_mean": 0.8,
+     "cpu_max": 6.9,
+     "mem_max_mib": 9.3
+    },
+    "lbdemo_backend2.1.78h3seumijesvty4pqhr9pt93": {
+     "cpu_mean": 0.8,
+     "cpu_max": 5.9,
+     "mem_max_mib": 9.3
+    },
+    "lbdemo_backend3.1.mhpy08mxi02bgwu6i8ubhkb8y": {
+     "cpu_mean": 1.4,
+     "cpu_max": 8.4,
+     "mem_max_mib": 9.4
+    },
+    "lbdemo_loadbalancer.1.zbhx28wvwvum111q8s5y16i6c": {
+     "cpu_mean": 0.2,
+     "cpu_max": 1.3,
+     "mem_max_mib": 9.5
+    },
+    "locust (load generator)": {
+     "cpu_mean": 17.4,
+     "cpu_max": 48.9,
+     "mem_max_mib": 47.4
+    },
+    "payment-service-1": {
+     "cpu_mean": 15.8,
+     "cpu_max": 81.2,
+     "mem_max_mib": 53.3
+    },
+    "payment-service-2": {
+     "cpu_mean": 17.0,
+     "cpu_max": 89.5,
+     "mem_max_mib": 66.7
+    },
+    "postgres": {
+     "cpu_mean": 21.5,
+     "cpu_max": 39.4,
+     "mem_max_mib": 106.9
+    },
+    "redis": {
+     "cpu_mean": 10.3,
+     "cpu_max": 20.5,
+     "mem_max_mib": 10.8
+    },
+    "restaurant-api": {
+     "cpu_mean": 1.2,
+     "cpu_max": 12.8,
+     "mem_max_mib": 37.4
+    },
+    "restaurant-mongodb": {
+     "cpu_mean": 1.4,
+     "cpu_max": 3.2,
+     "mem_max_mib": 193.6
+    },
+    "sdpractical4-mongos": {
+     "cpu_mean": 0.2,
+     "cpu_max": 1.3,
+     "mem_max_mib": 22.0
+    },
+    "worker-1": {
+     "cpu_mean": 22.4,
+     "cpu_max": 76.0,
+     "mem_max_mib": 60.9
+    },
+    "worker-2": {
+     "cpu_mean": 15.7,
+     "cpu_max": 53.6,
+     "mem_max_mib": 65.0
+    }
+   }
+  },
+  {
+   "label": "scale-u200",
+   "users": 200,
+   "variant": "",
+   "limiter": "on",
+   "server_metrics_partial": false,
+   "load_s": 64.0,
+   "queue_drain_s": 0.0,
+   "host": {
+    "os": "Windows 11",
+    "cpus": 12,
+    "python": "3.13.3"
+   },
+   "client": {
+    "requests": 5085,
+    "failures": 0,
+    "rps": 85.5686689882104,
+    "p50": 640.0,
+    "p95": 4600.0,
+    "p99": 7700.0,
+    "avg": 1261.9820673866252,
+    "max": 12752.469470999984,
+    "rate_limited": 0,
+    "other_failures": 0,
+    "failures_by_error": {},
+    "ok_rps": 79.5
+   },
+   "endpoints": [
+    {
+     "name": "GET /accounts/[vpa]/balance",
+     "requests": 1870,
+     "failures": 0,
+     "rps": 31.467730778358597,
+     "p50": 1100.0,
+     "p95": 5500.0,
+     "p99": 8100.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/balance (abusive client)",
+     "requests": 212,
+     "failures": 0,
+     "rps": 3.56746466578183,
+     "p50": 32.0,
+     "p95": 2600.0,
+     "p99": 5400.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/transactions",
+     "requests": 257,
+     "failures": 0,
+     "rps": 4.324709524084577,
+     "p50": 1100.0,
+     "p95": 6100.0,
+     "p99": 7900.0
+    },
+    {
+     "name": "GET /payments/[txn_id]",
+     "requests": 592,
+     "failures": 0,
+     "rps": 9.961976802560581,
+     "p50": 240.0,
+     "p95": 1700.0,
+     "p99": 3500.0
+    },
+    {
+     "name": "GET /vpa/[vpa]",
+     "requests": 1189,
+     "failures": 0,
+     "rps": 20.008091922710356,
+     "p50": 1100.0,
+     "p95": 5500.0,
+     "p99": 9000.0
+    },
+    {
+     "name": "POST /payments",
+     "requests": 965,
+     "failures": 0,
+     "rps": 16.23869529471446,
+     "p50": 280.0,
+     "p95": 1400.0,
+     "p99": 2700.0
+    }
+   ],
+   "history": [
+    {
+     "t": 0,
+     "users": 0.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": null
+    },
+    {
+     "t": 1,
+     "users": 40.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 0.0
+    },
+    {
+     "t": 2,
+     "users": 80.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 300.0
+    },
+    {
+     "t": 3,
+     "users": 120.0,
+     "rps": 1.0,
+     "fps": 0.0,
+     "p95": 270.0
+    },
+    {
+     "t": 4,
+     "users": 160.0,
+     "rps": 43.5,
+     "fps": 0.0,
+     "p95": 520.0
+    },
+    {
+     "t": 5,
+     "users": 200.0,
+     "rps": 73.666667,
+     "fps": 0.0,
+     "p95": 910.0
+    },
+    {
+     "t": 6,
+     "users": 200.0,
+     "rps": 88.25,
+     "fps": 0.0,
+     "p95": 1200.0
+    },
+    {
+     "t": 7,
+     "users": 200.0,
+     "rps": 88.0,
+     "fps": 0.0,
+     "p95": 2000.0
+    },
+    {
+     "t": 8,
+     "users": 200.0,
+     "rps": 85.333333,
+     "fps": 0.0,
+     "p95": 2200.0
+    },
+    {
+     "t": 9,
+     "users": 200.0,
+     "rps": 86.857143,
+     "fps": 0.0,
+     "p95": 2100.0
+    },
+    {
+     "t": 10,
+     "users": 200.0,
+     "rps": 91.625,
+     "fps": 0.0,
+     "p95": 2100.0
+    },
+    {
+     "t": 11,
+     "users": 200.0,
+     "rps": 95.444444,
+     "fps": 0.0,
+     "p95": 2400.0
+    },
+    {
+     "t": 12,
+     "users": 200.0,
+     "rps": 100.5,
+     "fps": 0.0,
+     "p95": 2600.0
+    },
+    {
+     "t": 13,
+     "users": 200.0,
+     "rps": 97.3,
+     "fps": 0.0,
+     "p95": 2900.0
+    },
+    {
+     "t": 14,
+     "users": 200.0,
+     "rps": 92.7,
+     "fps": 0.0,
+     "p95": 3300.0
+    },
+    {
+     "t": 15,
+     "users": 200.0,
+     "rps": 86.1,
+     "fps": 0.0,
+     "p95": 3700.0
+    },
+    {
+     "t": 16,
+     "users": 200.0,
+     "rps": 83.7,
+     "fps": 0.0,
+     "p95": 3900.0
+    },
+    {
+     "t": 17,
+     "users": 200.0,
+     "rps": 82.7,
+     "fps": 0.0,
+     "p95": 4300.0
+    },
+    {
+     "t": 18,
+     "users": 200.0,
+     "rps": 75.5,
+     "fps": 0.0,
+     "p95": 4700.0
+    },
+    {
+     "t": 19,
+     "users": 200.0,
+     "rps": 68.6,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 20,
+     "users": 200.0,
+     "rps": 62.7,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 21,
+     "users": 200.0,
+     "rps": 66.0,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 22,
+     "users": 200.0,
+     "rps": 74.3,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 23,
+     "users": 200.0,
+     "rps": 81.8,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 24,
+     "users": 200.0,
+     "rps": 83.4,
+     "fps": 0.0,
+     "p95": 5400.0
+    },
+    {
+     "t": 25,
+     "users": 200.0,
+     "rps": 83.8,
+     "fps": 0.0,
+     "p95": 5400.0
+    },
+    {
+     "t": 26,
+     "users": 200.0,
+     "rps": 87.1,
+     "fps": 0.0,
+     "p95": 5200.0
+    },
+    {
+     "t": 27,
+     "users": 200.0,
+     "rps": 90.0,
+     "fps": 0.0,
+     "p95": 4600.0
+    },
+    {
+     "t": 28,
+     "users": 200.0,
+     "rps": 88.2,
+     "fps": 0.0,
+     "p95": 4000.0
+    },
+    {
+     "t": 29,
+     "users": 200.0,
+     "rps": 89.5,
+     "fps": 0.0,
+     "p95": 4000.0
+    },
+    {
+     "t": 30,
+     "users": 200.0,
+     "rps": 90.3,
+     "fps": 0.0,
+     "p95": 4400.0
+    },
+    {
+     "t": 31,
+     "users": 200.0,
+     "rps": 85.3,
+     "fps": 0.0,
+     "p95": 4400.0
+    },
+    {
+     "t": 32,
+     "users": 200.0,
+     "rps": 85.7,
+     "fps": 0.0,
+     "p95": 4300.0
+    },
+    {
+     "t": 33,
+     "users": 200.0,
+     "rps": 89.8,
+     "fps": 0.0,
+     "p95": 4300.0
+    },
+    {
+     "t": 34,
+     "users": 200.0,
+     "rps": 94.2,
+     "fps": 0.0,
+     "p95": 4300.0
+    },
+    {
+     "t": 35,
+     "users": 200.0,
+     "rps": 96.0,
+     "fps": 0.0,
+     "p95": 4300.0
+    },
+    {
+     "t": 36,
+     "users": 200.0,
+     "rps": 91.5,
+     "fps": 0.0,
+     "p95": 4200.0
+    },
+    {
+     "t": 37,
+     "users": 200.0,
+     "rps": 88.5,
+     "fps": 0.0,
+     "p95": 4200.0
+    },
+    {
+     "t": 38,
+     "users": 200.0,
+     "rps": 95.4,
+     "fps": 0.0,
+     "p95": 4000.0
+    },
+    {
+     "t": 39,
+     "users": 200.0,
+     "rps": 103.9,
+     "fps": 0.0,
+     "p95": 3300.0
+    },
+    {
+     "t": 40,
+     "users": 200.0,
+     "rps": 102.3,
+     "fps": 0.0,
+     "p95": 3200.0
+    },
+    {
+     "t": 41,
+     "users": 200.0,
+     "rps": 104.7,
+     "fps": 0.0,
+     "p95": 3400.0
+    },
+    {
+     "t": 42,
+     "users": 200.0,
+     "rps": 100.6,
+     "fps": 0.0,
+     "p95": 3600.0
+    },
+    {
+     "t": 43,
+     "users": 200.0,
+     "rps": 90.3,
+     "fps": 0.0,
+     "p95": 3600.0
+    },
+    {
+     "t": 44,
+     "users": 200.0,
+     "rps": 85.2,
+     "fps": 0.0,
+     "p95": 3600.0
+    },
+    {
+     "t": 45,
+     "users": 200.0,
+     "rps": 89.2,
+     "fps": 0.0,
+     "p95": 3700.0
+    },
+    {
+     "t": 46,
+     "users": 200.0,
+     "rps": 88.6,
+     "fps": 0.0,
+     "p95": 3300.0
+    },
+    {
+     "t": 47,
+     "users": 200.0,
+     "rps": 80.4,
+     "fps": 0.0,
+     "p95": 3700.0
+    },
+    {
+     "t": 48,
+     "users": 200.0,
+     "rps": 67.0,
+     "fps": 0.0,
+     "p95": 4900.0
+    },
+    {
+     "t": 49,
+     "users": 200.0,
+     "rps": 63.5,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 50,
+     "users": 200.0,
+     "rps": 57.5,
+     "fps": 0.0,
+     "p95": 6900.0
+    },
+    {
+     "t": 51,
+     "users": 200.0,
+     "rps": 54.1,
+     "fps": 0.0,
+     "p95": 7700.0
+    },
+    {
+     "t": 52,
+     "users": 200.0,
+     "rps": 57.6,
+     "fps": 0.0,
+     "p95": 7900.0
+    },
+    {
+     "t": 53,
+     "users": 200.0,
+     "rps": 56.2,
+     "fps": 0.0,
+     "p95": 8100.0
+    },
+    {
+     "t": 54,
+     "users": 200.0,
+     "rps": 50.6,
+     "fps": 0.0,
+     "p95": 7900.0
+    },
+    {
+     "t": 55,
+     "users": 200.0,
+     "rps": 54.0,
+     "fps": 0.0,
+     "p95": 7900.0
+    }
+   ],
+   "server": {
+    "forwarded": 5171.0,
+    "rate_limited": {
+     "client": 0
+    },
+    "upstream_errors": 0.0,
+    "gateway_ms": {
+     "p50": 614.9,
+     "p95": 4671.99,
+     "p99": 8881.94,
+     "count": 5171,
+     "mean": 1201.94
+    },
+    "upstream_payment_ms": {
+     "p50": 198.19,
+     "p95": 1318.97,
+     "p99": 2641.67,
+     "count": 1560,
+     "mean": 365.39
+    },
+    "upstream_account_ms": {
+     "p50": 939.22,
+     "p95": 5410.9,
+     "p99": 9252.39,
+     "count": 3611,
+     "mean": 1522.08
+    },
+    "payment_service_ms": {
+     "p50": 22.3,
+     "p95": 81.91,
+     "p99": 205.71,
+     "count": 1560,
+     "mean": 30.73
+    },
+    "account_service_ms": {
+     "p50": 1.69,
+     "p95": 6.56,
+     "p99": 13.08,
+     "count": 3611,
+     "mean": 2.47
+    },
+    "db_query_ms": {
+     "p50": 1.81,
+     "p95": 4.57,
+     "p99": 10.37,
+     "count": 1056,
+     "mean": 2.27
+    },
+    "db_queries": 2439.0,
+    "cache_hit_ratio": 76.0,
+    "cache_hits": 4666,
+    "cache_misses": 1472,
+    "payments_created": 967.0,
+    "payments_success": 959.0,
+    "payments_failed": 8.0,
+    "settle_per_s": 15.1,
+    "queue_wait_ms": {
+     "p50": 1.66,
+     "p95": 3.09,
+     "p99": 7.17,
+     "count": 967,
+     "mean": 1.96
+    },
+    "processing_ms": {
+     "p50": 73.12,
+     "p95": 129.23,
+     "p99": 346.6,
+     "count": 967,
+     "mean": 79.92
+    },
+    "bank_call_ms": {
+     "p50": 46.47,
+     "p95": 72.6,
+     "p99": 81.35,
+     "count": 973,
+     "mean": 46.69
+    },
+    "txn_e2e_ms": {
+     "p50": 65.94,
+     "p95": 100.1,
+     "p99": 291.57,
+     "count": 959,
+     "mean": 72.45
+    },
+    "queue_pending_max": 4,
+    "queue_lag_max": 0
+   },
+   "timeline": [
+    {
+     "t": 0.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8144.0,
+     "payments_success": 995.0
+    },
+    {
+     "t": 2.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8144.0,
+     "payments_success": 995.0
+    },
+    {
+     "t": 4.2,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8195.0,
+     "payments_success": 1000.0
+    },
+    {
+     "t": 6.2,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8463.0,
+     "payments_success": 1032.0
+    },
+    {
+     "t": 9.5,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 8726.0,
+     "payments_success": 1080.0
+    },
+    {
+     "t": 12.6,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 9082.0,
+     "payments_success": 1138.0
+    },
+    {
+     "t": 16.7,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 9361.0,
+     "payments_success": 1193.0
+    },
+    {
+     "t": 20.8,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 9572.0,
+     "payments_success": 1263.0
+    },
+    {
+     "t": 23.1,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 9837.0,
+     "payments_success": 1306.0
+    },
+    {
+     "t": 25.7,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 10133.0,
+     "payments_success": 1353.0
+    },
+    {
+     "t": 27.9,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 10333.0,
+     "payments_success": 1401.0
+    },
+    {
+     "t": 31.5,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 10523.0,
+     "payments_success": 1408.0
+    },
+    {
+     "t": 33.6,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 10743.0,
+     "payments_success": 1467.0
+    },
+    {
+     "t": 35.9,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 11095.0,
+     "payments_success": 1535.0
+    },
+    {
+     "t": 40.3,
+     "queue_pending": 4,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 11447.0,
+     "payments_success": 1572.0
+    },
+    {
+     "t": 43.7,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 11756.0,
+     "payments_success": 1643.0
+    },
+    {
+     "t": 46.5,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 12040.0,
+     "payments_success": 1709.0
+    },
+    {
+     "t": 57.0,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 12578.0,
+     "payments_success": 1815.0
+    },
+    {
+     "t": 59.8,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 12850.0,
+     "payments_success": 1872.0
+    },
+    {
+     "t": 63.3,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 13270.0,
+     "payments_success": 1927.0
+    }
+   ],
+   "resources": {
+    "account-service": {
+     "cpu_mean": 27.8,
+     "cpu_max": 81.3,
+     "mem_max_mib": 60.3
+    },
+    "bank-mock": {
+     "cpu_mean": 19.2,
+     "cpu_max": 103.6,
+     "mem_max_mib": 54.9
+    },
+    "gateway": {
+     "cpu_mean": 113.0,
+     "cpu_max": 174.1,
+     "mem_max_mib": 68.3
+    },
+    "hotel-graphql-api": {
+     "cpu_mean": 0.0,
+     "cpu_max": 0.2,
+     "mem_max_mib": 19.7
+    },
+    "hotel-rest-api": {
+     "cpu_mean": 0.1,
+     "cpu_max": 0.8,
+     "mem_max_mib": 15.1
+    },
+    "lbdemo_backend1.1.361vdrdfi45n4v14y606ww2nc": {
+     "cpu_mean": 0.8,
+     "cpu_max": 6.1,
+     "mem_max_mib": 8.9
+    },
+    "lbdemo_backend2.1.78h3seumijesvty4pqhr9pt93": {
+     "cpu_mean": 1.5,
+     "cpu_max": 7.2,
+     "mem_max_mib": 8.7
+    },
+    "lbdemo_backend3.1.mhpy08mxi02bgwu6i8ubhkb8y": {
+     "cpu_mean": 2.8,
+     "cpu_max": 13.8,
+     "mem_max_mib": 8.8
+    },
+    "lbdemo_loadbalancer.1.zbhx28wvwvum111q8s5y16i6c": {
+     "cpu_mean": 0.5,
+     "cpu_max": 2.5,
+     "mem_max_mib": 10.4
+    },
+    "locust (load generator)": {
+     "cpu_mean": 14.9,
+     "cpu_max": 31.1,
+     "mem_max_mib": 46.9
+    },
+    "payment-service-1": {
+     "cpu_mean": 20.3,
+     "cpu_max": 65.4,
+     "mem_max_mib": 54.5
+    },
+    "payment-service-2": {
+     "cpu_mean": 21.9,
+     "cpu_max": 111.2,
+     "mem_max_mib": 66.9
+    },
+    "postgres": {
+     "cpu_mean": 27.4,
+     "cpu_max": 92.9,
+     "mem_max_mib": 140.0
+    },
+    "redis": {
+     "cpu_mean": 10.8,
+     "cpu_max": 29.2,
+     "mem_max_mib": 13.4
+    },
+    "restaurant-api": {
+     "cpu_mean": 0.5,
+     "cpu_max": 1.4,
+     "mem_max_mib": 36.1
+    },
+    "restaurant-mongodb": {
+     "cpu_mean": 2.1,
+     "cpu_max": 4.9,
+     "mem_max_mib": 195.4
+    },
+    "sdpractical4-mongos": {
+     "cpu_mean": 0.2,
+     "cpu_max": 1.9,
+     "mem_max_mib": 23.9
+    },
+    "worker-1": {
+     "cpu_mean": 28.8,
+     "cpu_max": 78.7,
+     "mem_max_mib": 60.8
+    },
+    "worker-2": {
+     "cpu_mean": 26.6,
+     "cpu_max": 82.2,
+     "mem_max_mib": 63.8
+    }
+   }
+  },
+  {
+   "label": "scale-u500",
+   "users": 500,
+   "variant": "",
+   "limiter": "on",
+   "server_metrics_partial": false,
+   "load_s": 64.7,
+   "queue_drain_s": 1.3,
+   "host": {
+    "os": "Windows 11",
+    "cpus": 12,
+    "python": "3.13.3"
+   },
+   "client": {
+    "requests": 3889,
+    "failures": 0,
+    "rps": 66.01062748695506,
+    "p50": 2700.0,
+    "p95": 19000.0,
+    "p99": 25000.0,
+    "avg": 5127.278681604013,
+    "max": 46962.314625000006,
+    "rate_limited": 0,
+    "other_failures": 0,
+    "failures_by_error": {},
+    "ok_rps": 60.1
+   },
+   "endpoints": [
+    {
+     "name": "GET /accounts/[vpa]/balance",
+     "requests": 1511,
+     "failures": 0,
+     "rps": 25.647225027716402,
+     "p50": 5100.0,
+     "p95": 20000.0,
+     "p99": 26000.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/balance (abusive client)",
+     "requests": 24,
+     "failures": 0,
+     "rps": 0.4073682333985398,
+     "p50": 1300.0,
+     "p95": 15000.0,
+     "p99": 47000.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/transactions",
+     "requests": 209,
+     "failures": 0,
+     "rps": 3.5474983658456174,
+     "p50": 4700.0,
+     "p95": 22000.0,
+     "p99": 26000.0
+    },
+    {
+     "name": "GET /payments/[txn_id]",
+     "requests": 336,
+     "failures": 0,
+     "rps": 5.703155267579557,
+     "p50": 450.0,
+     "p95": 1800.0,
+     "p99": 3000.0
+    },
+    {
+     "name": "GET /vpa/[vpa]",
+     "requests": 970,
+     "failures": 0,
+     "rps": 16.46446609985765,
+     "p50": 4900.0,
+     "p95": 20000.0,
+     "p99": 26000.0
+    },
+    {
+     "name": "POST /payments",
+     "requests": 839,
+     "failures": 0,
+     "rps": 14.240914492557287,
+     "p50": 530.0,
+     "p95": 5400.0,
+     "p99": 12000.0
+    }
+   ],
+   "history": [
+    {
+     "t": 0,
+     "users": 0.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": null
+    },
+    {
+     "t": 1,
+     "users": 100.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 0.0
+    },
+    {
+     "t": 2,
+     "users": 200.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 1300.0
+    },
+    {
+     "t": 3,
+     "users": 300.0,
+     "rps": 52.0,
+     "fps": 0.0,
+     "p95": 1700.0
+    },
+    {
+     "t": 4,
+     "users": 400.0,
+     "rps": 50.5,
+     "fps": 0.0,
+     "p95": 2700.0
+    },
+    {
+     "t": 5,
+     "users": 500.0,
+     "rps": 46.666667,
+     "fps": 0.0,
+     "p95": 3400.0
+    },
+    {
+     "t": 6,
+     "users": 500.0,
+     "rps": 50.0,
+     "fps": 0.0,
+     "p95": 3800.0
+    },
+    {
+     "t": 7,
+     "users": 500.0,
+     "rps": 56.2,
+     "fps": 0.0,
+     "p95": 4200.0
+    },
+    {
+     "t": 8,
+     "users": 500.0,
+     "rps": 62.666667,
+     "fps": 0.0,
+     "p95": 5200.0
+    },
+    {
+     "t": 9,
+     "users": 500.0,
+     "rps": 65.0,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 10,
+     "users": 500.0,
+     "rps": 69.75,
+     "fps": 0.0,
+     "p95": 6100.0
+    },
+    {
+     "t": 11,
+     "users": 500.0,
+     "rps": 73.222222,
+     "fps": 0.0,
+     "p95": 6400.0
+    },
+    {
+     "t": 12,
+     "users": 500.0,
+     "rps": 73.2,
+     "fps": 0.0,
+     "p95": 6700.0
+    },
+    {
+     "t": 13,
+     "users": 500.0,
+     "rps": 73.4,
+     "fps": 0.0,
+     "p95": 7300.0
+    },
+    {
+     "t": 14,
+     "users": 500.0,
+     "rps": 74.5,
+     "fps": 0.0,
+     "p95": 8200.0
+    },
+    {
+     "t": 15,
+     "users": 500.0,
+     "rps": 73.4,
+     "fps": 0.0,
+     "p95": 9500.0
+    },
+    {
+     "t": 16,
+     "users": 500.0,
+     "rps": 71.5,
+     "fps": 0.0,
+     "p95": 11000.0
+    },
+    {
+     "t": 17,
+     "users": 500.0,
+     "rps": 70.6,
+     "fps": 0.0,
+     "p95": 12000.0
+    },
+    {
+     "t": 18,
+     "users": 500.0,
+     "rps": 66.2,
+     "fps": 0.0,
+     "p95": 12000.0
+    },
+    {
+     "t": 19,
+     "users": 500.0,
+     "rps": 67.1,
+     "fps": 0.0,
+     "p95": 12000.0
+    },
+    {
+     "t": 20,
+     "users": 500.0,
+     "rps": 62.6,
+     "fps": 0.0,
+     "p95": 13000.0
+    },
+    {
+     "t": 21,
+     "users": 500.0,
+     "rps": 55.9,
+     "fps": 0.0,
+     "p95": 14000.0
+    },
+    {
+     "t": 22,
+     "users": 500.0,
+     "rps": 52.1,
+     "fps": 0.0,
+     "p95": 15000.0
+    },
+    {
+     "t": 23,
+     "users": 500.0,
+     "rps": 49.8,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 24,
+     "users": 500.0,
+     "rps": 51.1,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 25,
+     "users": 500.0,
+     "rps": 59.9,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 26,
+     "users": 500.0,
+     "rps": 66.8,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 27,
+     "users": 500.0,
+     "rps": 65.8,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 28,
+     "users": 500.0,
+     "rps": 71.2,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 29,
+     "users": 500.0,
+     "rps": 75.0,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 30,
+     "users": 500.0,
+     "rps": 80.2,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 31,
+     "users": 500.0,
+     "rps": 88.4,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 32,
+     "users": 500.0,
+     "rps": 94.3,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 33,
+     "users": 500.0,
+     "rps": 98.1,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 34,
+     "users": 500.0,
+     "rps": 98.2,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 35,
+     "users": 500.0,
+     "rps": 94.5,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 36,
+     "users": 500.0,
+     "rps": 88.7,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 37,
+     "users": 500.0,
+     "rps": 86.6,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 38,
+     "users": 500.0,
+     "rps": 84.2,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 39,
+     "users": 500.0,
+     "rps": 79.0,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 40,
+     "users": 500.0,
+     "rps": 72.6,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 41,
+     "users": 500.0,
+     "rps": 63.6,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 42,
+     "users": 500.0,
+     "rps": 60.6,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 43,
+     "users": 500.0,
+     "rps": 56.0,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 44,
+     "users": 500.0,
+     "rps": 50.0,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 45,
+     "users": 500.0,
+     "rps": 49.1,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 46,
+     "users": 500.0,
+     "rps": 51.3,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 47,
+     "users": 500.0,
+     "rps": 51.7,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 48,
+     "users": 500.0,
+     "rps": 52.8,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 49,
+     "users": 500.0,
+     "rps": 57.4,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 50,
+     "users": 500.0,
+     "rps": 62.0,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 51,
+     "users": 500.0,
+     "rps": 60.8,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 52,
+     "users": 500.0,
+     "rps": 59.8,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 53,
+     "users": 500.0,
+     "rps": 63.3,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 54,
+     "users": 500.0,
+     "rps": 63.8,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 55,
+     "users": 500.0,
+     "rps": 64.7,
+     "fps": 0.0,
+     "p95": 23000.0
+    }
+   ],
+   "server": {
+    "forwarded": 4215.0,
+    "rate_limited": {
+     "client": 0
+    },
+    "upstream_errors": 0.0,
+    "gateway_ms": {
+     "p50": 2422.41,
+     "p95": 10000.0,
+     "p99": 10000.0,
+     "count": 4215,
+     "mean": 5160.96
+    },
+    "upstream_payment_ms": {
+     "p50": 320.75,
+     "p95": 1452.04,
+     "p99": 2316.92,
+     "count": 1188,
+     "mean": 492.75
+    },
+    "upstream_account_ms": {
+     "p50": 4829.16,
+     "p95": 10000.0,
+     "p99": 10000.0,
+     "count": 3027,
+     "mean": 6923.11
+    },
+    "payment_service_ms": {
+     "p50": 36.83,
+     "p95": 110.0,
+     "p99": 168.29,
+     "count": 1188,
+     "mean": 40.28
+    },
+    "account_service_ms": {
+     "p50": 1.9,
+     "p95": 7.17,
+     "p99": 14.96,
+     "count": 3027,
+     "mean": 2.89
+    },
+    "db_query_ms": {
+     "p50": 1.84,
+     "p95": 4.99,
+     "p99": 13.55,
+     "count": 1132,
+     "mean": 2.48
+    },
+    "db_queries": 2234.0,
+    "cache_hit_ratio": 72.5,
+    "cache_hits": 3671,
+    "cache_misses": 1389,
+    "payments_created": 845.0,
+    "payments_success": 841.0,
+    "payments_failed": 4.0,
+    "settle_per_s": 13.1,
+    "queue_wait_ms": {
+     "p50": 1.65,
+     "p95": 2.97,
+     "p99": 4.97,
+     "count": 845,
+     "mean": 1.81
+    },
+    "processing_ms": {
+     "p50": 74.6,
+     "p95": 114.46,
+     "p99": 147.6,
+     "count": 845,
+     "mean": 76.13
+    },
+    "bank_call_ms": {
+     "p50": 45.9,
+     "p95": 72.01,
+     "p99": 74.52,
+     "count": 849,
+     "mean": 45.83
+    },
+    "txn_e2e_ms": {
+     "p50": 66.94,
+     "p95": 97.7,
+     "p99": 137.82,
+     "count": 841,
+     "mean": 68.68
+    },
+    "queue_pending_max": 2,
+    "queue_lag_max": 0
+   },
+   "timeline": [
+    {
+     "t": 0.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 13315.0,
+     "payments_success": 1954.0
+    },
+    {
+     "t": 2.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 13315.0,
+     "payments_success": 1954.0
+    },
+    {
+     "t": 4.4,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 13402.0,
+     "payments_success": 1967.0
+    },
+    {
+     "t": 24.8,
+     "queue_pending": 2,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 14670.0,
+     "payments_success": 2289.0
+    },
+    {
+     "t": 50.4,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 16576.0,
+     "payments_success": 2648.0
+    },
+    {
+     "t": 61.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 17103.0,
+     "payments_success": 2767.0
+    },
+    {
+     "t": 66.4,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 697.0,
+     "gw_requests": 17448.0,
+     "payments_success": 2795.0
+    }
+   ],
+   "resources": {
+    "account-service": {
+     "cpu_mean": 26.9,
+     "cpu_max": 106.0,
+     "mem_max_mib": 62.3
+    },
+    "bank-mock": {
+     "cpu_mean": 18.9,
+     "cpu_max": 97.0,
+     "mem_max_mib": 55.0
+    },
+    "gateway": {
+     "cpu_mean": 113.4,
+     "cpu_max": 172.0,
+     "mem_max_mib": 84.5
+    },
+    "hotel-graphql-api": {
+     "cpu_mean": 0.1,
+     "cpu_max": 1.6,
+     "mem_max_mib": 21.5
+    },
+    "hotel-rest-api": {
+     "cpu_mean": 0.4,
+     "cpu_max": 6.2,
+     "mem_max_mib": 15.4
+    },
+    "lbdemo_backend1.1.361vdrdfi45n4v14y606ww2nc": {
+     "cpu_mean": 1.5,
+     "cpu_max": 8.6,
+     "mem_max_mib": 9.1
+    },
+    "lbdemo_backend2.1.78h3seumijesvty4pqhr9pt93": {
+     "cpu_mean": 1.6,
+     "cpu_max": 6.9,
+     "mem_max_mib": 8.9
+    },
+    "lbdemo_backend3.1.mhpy08mxi02bgwu6i8ubhkb8y": {
+     "cpu_mean": 0.8,
+     "cpu_max": 5.9,
+     "mem_max_mib": 10.3
+    },
+    "lbdemo_loadbalancer.1.zbhx28wvwvum111q8s5y16i6c": {
+     "cpu_mean": 0.4,
+     "cpu_max": 1.6,
+     "mem_max_mib": 9.4
+    },
+    "locust (load generator)": {
+     "cpu_mean": 14.0,
+     "cpu_max": 41.6,
+     "mem_max_mib": 56.9
+    },
+    "payment-service-1": {
+     "cpu_mean": 21.7,
+     "cpu_max": 107.3,
+     "mem_max_mib": 58.5
+    },
+    "payment-service-2": {
+     "cpu_mean": 16.8,
+     "cpu_max": 63.2,
+     "mem_max_mib": 64.2
+    },
+    "postgres": {
+     "cpu_mean": 23.4,
+     "cpu_max": 47.9,
+     "mem_max_mib": 145.4
+    },
+    "redis": {
+     "cpu_mean": 10.0,
+     "cpu_max": 16.4,
+     "mem_max_mib": 13.7
+    },
+    "restaurant-api": {
+     "cpu_mean": 0.3,
+     "cpu_max": 0.9,
+     "mem_max_mib": 37.6
+    },
+    "restaurant-mongodb": {
+     "cpu_mean": 1.9,
+     "cpu_max": 3.7,
+     "mem_max_mib": 195.6
+    },
+    "sdpractical4-mongos": {
+     "cpu_mean": 0.1,
+     "cpu_max": 0.4,
+     "mem_max_mib": 23.9
+    },
+    "worker-1": {
+     "cpu_mean": 26.8,
+     "cpu_max": 67.0,
+     "mem_max_mib": 63.0
+    },
+    "worker-2": {
+     "cpu_mean": 22.2,
+     "cpu_max": 82.5,
+     "mem_max_mib": 59.4
+    }
+   }
+  },
+  {
+   "label": "scale-u500-nolimit",
+   "users": 500,
+   "variant": "nolimit",
+   "limiter": "off",
+   "server_metrics_partial": false,
+   "load_s": 64.9,
+   "queue_drain_s": 3.7,
+   "host": {
+    "os": "Windows 11",
+    "cpus": 12,
+    "python": "3.13.3"
+   },
+   "client": {
+    "requests": 4040,
+    "failures": 0,
+    "rps": 68.34320121923872,
+    "p50": 2400.0,
+    "p95": 19000.0,
+    "p99": 31000.0,
+    "avg": 5123.8871338116405,
+    "max": 49431.00048400004,
+    "rate_limited": 0,
+    "other_failures": 0,
+    "failures_by_error": {},
+    "ok_rps": 62.2
+   },
+   "endpoints": [
+    {
+     "name": "GET /accounts/[vpa]/balance",
+     "requests": 1588,
+     "failures": 0,
+     "rps": 26.86361473667106,
+     "p50": 4700.0,
+     "p95": 24000.0,
+     "p99": 34000.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/balance (abusive client)",
+     "requests": 38,
+     "failures": 0,
+     "rps": 0.6428320906760078,
+     "p50": 86.0,
+     "p95": 22000.0,
+     "p99": 25000.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/transactions",
+     "requests": 192,
+     "failures": 0,
+     "rps": 3.247993721310355,
+     "p50": 4100.0,
+     "p95": 20000.0,
+     "p99": 33000.0
+    },
+    {
+     "name": "GET /payments/[txn_id]",
+     "requests": 381,
+     "failures": 0,
+     "rps": 6.445237540725236,
+     "p50": 410.0,
+     "p95": 1600.0,
+     "p99": 2900.0
+    },
+    {
+     "name": "GET /vpa/[vpa]",
+     "requests": 952,
+     "failures": 0,
+     "rps": 16.10463553483051,
+     "p50": 4500.0,
+     "p95": 22000.0,
+     "p99": 32000.0
+    },
+    {
+     "name": "POST /payments",
+     "requests": 889,
+     "failures": 0,
+     "rps": 15.03888759502555,
+     "p50": 460.0,
+     "p95": 7400.0,
+     "p99": 11000.0
+    }
+   ],
+   "history": [
+    {
+     "t": 0,
+     "users": 0.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": null
+    },
+    {
+     "t": 1,
+     "users": 100.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 0.0
+    },
+    {
+     "t": 2,
+     "users": 200.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 670.0
+    },
+    {
+     "t": 3,
+     "users": 300.0,
+     "rps": 66.0,
+     "fps": 0.0,
+     "p95": 1600.0
+    },
+    {
+     "t": 4,
+     "users": 400.0,
+     "rps": 76.5,
+     "fps": 0.0,
+     "p95": 2400.0
+    },
+    {
+     "t": 5,
+     "users": 500.0,
+     "rps": 67.666667,
+     "fps": 0.0,
+     "p95": 2600.0
+    },
+    {
+     "t": 6,
+     "users": 500.0,
+     "rps": 71.0,
+     "fps": 0.0,
+     "p95": 3600.0
+    },
+    {
+     "t": 7,
+     "users": 500.0,
+     "rps": 71.2,
+     "fps": 0.0,
+     "p95": 4100.0
+    },
+    {
+     "t": 8,
+     "users": 500.0,
+     "rps": 66.666667,
+     "fps": 0.0,
+     "p95": 4800.0
+    },
+    {
+     "t": 9,
+     "users": 500.0,
+     "rps": 67.571429,
+     "fps": 0.0,
+     "p95": 5500.0
+    },
+    {
+     "t": 10,
+     "users": 500.0,
+     "rps": 64.25,
+     "fps": 0.0,
+     "p95": 6000.0
+    },
+    {
+     "t": 11,
+     "users": 500.0,
+     "rps": 64.888889,
+     "fps": 0.0,
+     "p95": 7200.0
+    },
+    {
+     "t": 12,
+     "users": 500.0,
+     "rps": 65.7,
+     "fps": 0.0,
+     "p95": 8300.0
+    },
+    {
+     "t": 13,
+     "users": 500.0,
+     "rps": 66.5,
+     "fps": 0.0,
+     "p95": 8900.0
+    },
+    {
+     "t": 14,
+     "users": 500.0,
+     "rps": 65.1,
+     "fps": 0.0,
+     "p95": 9500.0
+    },
+    {
+     "t": 15,
+     "users": 500.0,
+     "rps": 67.9,
+     "fps": 0.0,
+     "p95": 9800.0
+    },
+    {
+     "t": 16,
+     "users": 500.0,
+     "rps": 70.2,
+     "fps": 0.0,
+     "p95": 10000.0
+    },
+    {
+     "t": 17,
+     "users": 500.0,
+     "rps": 70.3,
+     "fps": 0.0,
+     "p95": 11000.0
+    },
+    {
+     "t": 18,
+     "users": 500.0,
+     "rps": 71.6,
+     "fps": 0.0,
+     "p95": 12000.0
+    },
+    {
+     "t": 19,
+     "users": 500.0,
+     "rps": 68.8,
+     "fps": 0.0,
+     "p95": 12000.0
+    },
+    {
+     "t": 20,
+     "users": 500.0,
+     "rps": 67.3,
+     "fps": 0.0,
+     "p95": 14000.0
+    },
+    {
+     "t": 21,
+     "users": 500.0,
+     "rps": 65.8,
+     "fps": 0.0,
+     "p95": 15000.0
+    },
+    {
+     "t": 22,
+     "users": 500.0,
+     "rps": 63.4,
+     "fps": 0.0,
+     "p95": 15000.0
+    },
+    {
+     "t": 23,
+     "users": 500.0,
+     "rps": 61.1,
+     "fps": 0.0,
+     "p95": 16000.0
+    },
+    {
+     "t": 24,
+     "users": 500.0,
+     "rps": 57.7,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 25,
+     "users": 500.0,
+     "rps": 54.2,
+     "fps": 0.0,
+     "p95": 18000.0
+    },
+    {
+     "t": 26,
+     "users": 500.0,
+     "rps": 49.1,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 27,
+     "users": 500.0,
+     "rps": 47.8,
+     "fps": 0.0,
+     "p95": 19000.0
+    },
+    {
+     "t": 28,
+     "users": 500.0,
+     "rps": 46.9,
+     "fps": 0.0,
+     "p95": 20000.0
+    },
+    {
+     "t": 29,
+     "users": 500.0,
+     "rps": 45.7,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 30,
+     "users": 500.0,
+     "rps": 48.9,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 31,
+     "users": 500.0,
+     "rps": 48.0,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 32,
+     "users": 500.0,
+     "rps": 46.1,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 33,
+     "users": 500.0,
+     "rps": 44.1,
+     "fps": 0.0,
+     "p95": 23000.0
+    },
+    {
+     "t": 34,
+     "users": 500.0,
+     "rps": 44.0,
+     "fps": 0.0,
+     "p95": 25000.0
+    },
+    {
+     "t": 35,
+     "users": 500.0,
+     "rps": 46.3,
+     "fps": 0.0,
+     "p95": 25000.0
+    },
+    {
+     "t": 36,
+     "users": 500.0,
+     "rps": 52.2,
+     "fps": 0.0,
+     "p95": 25000.0
+    },
+    {
+     "t": 37,
+     "users": 500.0,
+     "rps": 55.4,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 38,
+     "users": 500.0,
+     "rps": 62.5,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 39,
+     "users": 500.0,
+     "rps": 66.3,
+     "fps": 0.0,
+     "p95": 27000.0
+    },
+    {
+     "t": 40,
+     "users": 500.0,
+     "rps": 69.3,
+     "fps": 0.0,
+     "p95": 27000.0
+    },
+    {
+     "t": 41,
+     "users": 500.0,
+     "rps": 73.3,
+     "fps": 0.0,
+     "p95": 27000.0
+    },
+    {
+     "t": 42,
+     "users": 500.0,
+     "rps": 77.8,
+     "fps": 0.0,
+     "p95": 27000.0
+    },
+    {
+     "t": 43,
+     "users": 500.0,
+     "rps": 83.3,
+     "fps": 0.0,
+     "p95": 27000.0
+    },
+    {
+     "t": 44,
+     "users": 500.0,
+     "rps": 90.0,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 45,
+     "users": 500.0,
+     "rps": 90.1,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 46,
+     "users": 500.0,
+     "rps": 86.2,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 47,
+     "users": 500.0,
+     "rps": 89.2,
+     "fps": 0.0,
+     "p95": 26000.0
+    },
+    {
+     "t": 48,
+     "users": 500.0,
+     "rps": 85.1,
+     "fps": 0.0,
+     "p95": 25000.0
+    },
+    {
+     "t": 49,
+     "users": 500.0,
+     "rps": 82.7,
+     "fps": 0.0,
+     "p95": 22000.0
+    },
+    {
+     "t": 50,
+     "users": 500.0,
+     "rps": 83.9,
+     "fps": 0.0,
+     "p95": 21000.0
+    },
+    {
+     "t": 51,
+     "users": 500.0,
+     "rps": 84.5,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 52,
+     "users": 500.0,
+     "rps": 85.3,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 53,
+     "users": 500.0,
+     "rps": 88.5,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 54,
+     "users": 500.0,
+     "rps": 87.6,
+     "fps": 0.0,
+     "p95": 17000.0
+    },
+    {
+     "t": 55,
+     "users": 500.0,
+     "rps": 94.5,
+     "fps": 0.0,
+     "p95": 17000.0
+    }
+   ],
+   "server": {
+    "forwarded": 4450.0,
+    "rate_limited": {},
+    "upstream_errors": 0.0,
+    "gateway_ms": {
+     "p50": 2461.75,
+     "p95": 10000.0,
+     "p99": 10000.0,
+     "count": 4450,
+     "mean": 5157.23
+    },
+    "upstream_payment_ms": {
+     "p50": 348.71,
+     "p95": 1680.26,
+     "p99": 2904.67,
+     "count": 1286,
+     "mean": 532.75
+    },
+    "upstream_account_ms": {
+     "p50": 4794.24,
+     "p95": 10000.0,
+     "p99": 10000.0,
+     "count": 3164,
+     "mean": 7036.39
+    },
+    "payment_service_ms": {
+     "p50": 36.44,
+     "p95": 126.42,
+     "p99": 194.5,
+     "count": 1286,
+     "mean": 41.64
+    },
+    "account_service_ms": {
+     "p50": 1.9,
+     "p95": 7.09,
+     "p99": 13.84,
+     "count": 3156,
+     "mean": 2.78
+    },
+    "db_query_ms": {
+     "p50": 1.86,
+     "p95": 4.86,
+     "p99": 12.27,
+     "count": 1192,
+     "mean": 2.31
+    },
+    "db_queries": 2372.0,
+    "cache_hit_ratio": 72.4,
+    "cache_hits": 3864,
+    "cache_misses": 1475,
+    "payments_created": 897.0,
+    "payments_success": 892.0,
+    "payments_failed": 5.0,
+    "settle_per_s": 13.8,
+    "queue_wait_ms": {
+     "p50": 1.69,
+     "p95": 3.01,
+     "p99": 5.37,
+     "count": 897,
+     "mean": 1.85
+    },
+    "processing_ms": {
+     "p50": 75.03,
+     "p95": 126.58,
+     "p99": 190.3,
+     "count": 897,
+     "mean": 77.96
+    },
+    "bank_call_ms": {
+     "p50": 46.2,
+     "p95": 71.96,
+     "p99": 74.45,
+     "count": 907,
+     "mean": 46.23
+    },
+    "txn_e2e_ms": {
+     "p50": 67.37,
+     "p95": 103.75,
+     "p99": 226.0,
+     "count": 892,
+     "mean": 71.3
+    },
+    "queue_pending_max": 5,
+    "queue_lag_max": 0
+   },
+   "timeline": [
+    {
+     "t": 0.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 2795.0
+    },
+    {
+     "t": 2.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 2795.0
+    },
+    {
+     "t": 4.2,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 101.0,
+     "payments_success": 2812.0
+    },
+    {
+     "t": 45.1,
+     "queue_pending": 1,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2677.0,
+     "payments_success": 3353.0
+    },
+    {
+     "t": 48.4,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2956.0,
+     "payments_success": 3441.0
+    },
+    {
+     "t": 51.8,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 3251.0,
+     "payments_success": 3491.0
+    },
+    {
+     "t": 63.8,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 4095.0,
+     "payments_success": 3666.0
+    },
+    {
+     "t": 67.8,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 4341.0,
+     "payments_success": 3687.0
+    }
+   ],
+   "resources": {
+    "account-service": {
+     "cpu_mean": 24.5,
+     "cpu_max": 96.1,
+     "mem_max_mib": 64.1
+    },
+    "bank-mock": {
+     "cpu_mean": 13.0,
+     "cpu_max": 64.1,
+     "mem_max_mib": 53.2
+    },
+    "gateway": {
+     "cpu_mean": 99.0,
+     "cpu_max": 182.0,
+     "mem_max_mib": 69.2
+    },
+    "hotel-graphql-api": {
+     "cpu_mean": 0.1,
+     "cpu_max": 1.2,
+     "mem_max_mib": 23.1
+    },
+    "hotel-rest-api": {
+     "cpu_mean": 0.0,
+     "cpu_max": 0.0,
+     "mem_max_mib": 15.2
+    },
+    "lbdemo_backend1.1.361vdrdfi45n4v14y606ww2nc": {
+     "cpu_mean": 1.1,
+     "cpu_max": 8.9,
+     "mem_max_mib": 9.2
+    },
+    "lbdemo_backend2.1.78h3seumijesvty4pqhr9pt93": {
+     "cpu_mean": 2.1,
+     "cpu_max": 11.6,
+     "mem_max_mib": 9.3
+    },
+    "lbdemo_backend3.1.mhpy08mxi02bgwu6i8ubhkb8y": {
+     "cpu_mean": 2.4,
+     "cpu_max": 22.6,
+     "mem_max_mib": 9.1
+    },
+    "lbdemo_loadbalancer.1.zbhx28wvwvum111q8s5y16i6c": {
+     "cpu_mean": 0.2,
+     "cpu_max": 2.0,
+     "mem_max_mib": 10.2
+    },
+    "locust (load generator)": {
+     "cpu_mean": 17.4,
+     "cpu_max": 72.6,
+     "mem_max_mib": 57.4
+    },
+    "payment-service-1": {
+     "cpu_mean": 25.9,
+     "cpu_max": 108.0,
+     "mem_max_mib": 59.5
+    },
+    "payment-service-2": {
+     "cpu_mean": 16.5,
+     "cpu_max": 63.0,
+     "mem_max_mib": 64.1
+    },
+    "postgres": {
+     "cpu_mean": 24.0,
+     "cpu_max": 39.5,
+     "mem_max_mib": 157.3
+    },
+    "redis": {
+     "cpu_mean": 6.8,
+     "cpu_max": 12.2,
+     "mem_max_mib": 13.8
+    },
+    "restaurant-api": {
+     "cpu_mean": 0.2,
+     "cpu_max": 1.0,
+     "mem_max_mib": 38.7
+    },
+    "restaurant-mongodb": {
+     "cpu_mean": 2.2,
+     "cpu_max": 9.9,
+     "mem_max_mib": 195.7
+    },
+    "sdpractical4-mongos": {
+     "cpu_mean": 0.2,
+     "cpu_max": 0.8,
+     "mem_max_mib": 26.0
+    },
+    "worker-1": {
+     "cpu_mean": 26.5,
+     "cpu_max": 91.3,
+     "mem_max_mib": 61.8
+    },
+    "worker-2": {
+     "cpu_mean": 20.1,
+     "cpu_max": 97.7,
+     "mem_max_mib": 69.0
+    }
+   }
+  },
+  {
+   "label": "scale-u500-gw4",
+   "users": 500,
+   "variant": "gw4",
+   "limiter": "on",
+   "server_metrics_partial": true,
+   "load_s": 64.8,
+   "queue_drain_s": 2.1,
+   "host": {
+    "os": "Windows 11",
+    "cpus": 12,
+    "python": "3.13.3"
+   },
+   "client": {
+    "requests": 9252,
+    "failures": 177,
+    "rps": 157.3418765314505,
+    "p50": 1300.0,
+    "p95": 6000.0,
+    "p99": 9200.0,
+    "avg": 1945.2073434627011,
+    "max": 16333.69430099998,
+    "rate_limited": 0,
+    "other_failures": 177,
+    "failures_by_error": {
+     "CatchResponseError('HTTP 503')": 177
+    },
+    "ok_rps": 140.0
+   },
+   "endpoints": [
+    {
+     "name": "GET /accounts/[vpa]/balance",
+     "requests": 3502,
+     "failures": 78,
+     "rps": 59.555907005311255,
+     "p50": 1900.0,
+     "p95": 6700.0,
+     "p99": 10000.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/balance (abusive client)",
+     "requests": 59,
+     "failures": 22,
+     "rps": 1.0033690786160376,
+     "p50": 970.0,
+     "p95": 7400.0,
+     "p99": 8900.0
+    },
+    {
+     "name": "GET /accounts/[vpa]/transactions",
+     "requests": 481,
+     "failures": 9,
+     "rps": 8.180008929056171,
+     "p50": 1900.0,
+     "p95": 7200.0,
+     "p99": 9600.0
+    },
+    {
+     "name": "GET /payments/[txn_id]",
+     "requests": 1045,
+     "failures": 0,
+     "rps": 17.7715370704027,
+     "p50": 440.0,
+     "p95": 1700.0,
+     "p99": 2500.0
+    },
+    {
+     "name": "GET /vpa/[vpa]",
+     "requests": 2265,
+     "failures": 68,
+     "rps": 38.51916886551399,
+     "p50": 1900.0,
+     "p95": 6700.0,
+     "p99": 10000.0
+    },
+    {
+     "name": "POST /payments",
+     "requests": 1900,
+     "failures": 0,
+     "rps": 32.31188558255037,
+     "p50": 530.0,
+     "p95": 2000.0,
+     "p99": 2700.0
+    }
+   ],
+   "history": [
+    {
+     "t": 0,
+     "users": 0.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": null
+    },
+    {
+     "t": 1,
+     "users": 100.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 0.0
+    },
+    {
+     "t": 2,
+     "users": 200.0,
+     "rps": 0.0,
+     "fps": 0.0,
+     "p95": 1800.0
+    },
+    {
+     "t": 3,
+     "users": 300.0,
+     "rps": 7.0,
+     "fps": 0.0,
+     "p95": 2500.0
+    },
+    {
+     "t": 4,
+     "users": 400.0,
+     "rps": 19.5,
+     "fps": 0.0,
+     "p95": 2500.0
+    },
+    {
+     "t": 5,
+     "users": 500.0,
+     "rps": 34.0,
+     "fps": 0.0,
+     "p95": 2700.0
+    },
+    {
+     "t": 6,
+     "users": 500.0,
+     "rps": 53.8,
+     "fps": 11.2,
+     "p95": 2900.0
+    },
+    {
+     "t": 7,
+     "users": 500.0,
+     "rps": 81.166667,
+     "fps": 22.5,
+     "p95": 3100.0
+    },
+    {
+     "t": 8,
+     "users": 500.0,
+     "rps": 95.285714,
+     "fps": 25.285714,
+     "p95": 3500.0
+    },
+    {
+     "t": 9,
+     "users": 500.0,
+     "rps": 98.125,
+     "fps": 22.125,
+     "p95": 3800.0
+    },
+    {
+     "t": 10,
+     "users": 500.0,
+     "rps": 102.777778,
+     "fps": 19.666667,
+     "p95": 4100.0
+    },
+    {
+     "t": 11,
+     "users": 500.0,
+     "rps": 104.5,
+     "fps": 17.7,
+     "p95": 4500.0
+    },
+    {
+     "t": 12,
+     "users": 500.0,
+     "rps": 115.8,
+     "fps": 17.7,
+     "p95": 4900.0
+    },
+    {
+     "t": 13,
+     "users": 500.0,
+     "rps": 122.1,
+     "fps": 17.7,
+     "p95": 5300.0
+    },
+    {
+     "t": 14,
+     "users": 500.0,
+     "rps": 126.5,
+     "fps": 17.7,
+     "p95": 6000.0
+    },
+    {
+     "t": 15,
+     "users": 500.0,
+     "rps": 134.1,
+     "fps": 16.4,
+     "p95": 6800.0
+    },
+    {
+     "t": 16,
+     "users": 500.0,
+     "rps": 142.9,
+     "fps": 12.1,
+     "p95": 6900.0
+    },
+    {
+     "t": 17,
+     "users": 500.0,
+     "rps": 146.3,
+     "fps": 4.2,
+     "p95": 7300.0
+    },
+    {
+     "t": 18,
+     "users": 500.0,
+     "rps": 146.0,
+     "fps": 0.0,
+     "p95": 7300.0
+    },
+    {
+     "t": 19,
+     "users": 500.0,
+     "rps": 147.8,
+     "fps": 0.0,
+     "p95": 7300.0
+    },
+    {
+     "t": 20,
+     "users": 500.0,
+     "rps": 142.3,
+     "fps": 0.0,
+     "p95": 7300.0
+    },
+    {
+     "t": 21,
+     "users": 500.0,
+     "rps": 143.4,
+     "fps": 0.0,
+     "p95": 7200.0
+    },
+    {
+     "t": 22,
+     "users": 500.0,
+     "rps": 144.5,
+     "fps": 0.0,
+     "p95": 7100.0
+    },
+    {
+     "t": 23,
+     "users": 500.0,
+     "rps": 155.5,
+     "fps": 0.0,
+     "p95": 6800.0
+    },
+    {
+     "t": 24,
+     "users": 500.0,
+     "rps": 169.7,
+     "fps": 0.0,
+     "p95": 6100.0
+    },
+    {
+     "t": 25,
+     "users": 500.0,
+     "rps": 172.8,
+     "fps": 0.0,
+     "p95": 5800.0
+    },
+    {
+     "t": 26,
+     "users": 500.0,
+     "rps": 170.7,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 27,
+     "users": 500.0,
+     "rps": 162.5,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 28,
+     "users": 500.0,
+     "rps": 162.7,
+     "fps": 0.0,
+     "p95": 5800.0
+    },
+    {
+     "t": 29,
+     "users": 500.0,
+     "rps": 176.2,
+     "fps": 0.0,
+     "p95": 6000.0
+    },
+    {
+     "t": 30,
+     "users": 500.0,
+     "rps": 169.4,
+     "fps": 0.0,
+     "p95": 6100.0
+    },
+    {
+     "t": 31,
+     "users": 500.0,
+     "rps": 162.7,
+     "fps": 0.0,
+     "p95": 5800.0
+    },
+    {
+     "t": 32,
+     "users": 500.0,
+     "rps": 154.1,
+     "fps": 0.0,
+     "p95": 6800.0
+    },
+    {
+     "t": 33,
+     "users": 500.0,
+     "rps": 137.9,
+     "fps": 0.0,
+     "p95": 7300.0
+    },
+    {
+     "t": 34,
+     "users": 500.0,
+     "rps": 134.5,
+     "fps": 0.0,
+     "p95": 7500.0
+    },
+    {
+     "t": 35,
+     "users": 500.0,
+     "rps": 139.6,
+     "fps": 0.0,
+     "p95": 7600.0
+    },
+    {
+     "t": 36,
+     "users": 500.0,
+     "rps": 149.8,
+     "fps": 0.0,
+     "p95": 7600.0
+    },
+    {
+     "t": 37,
+     "users": 500.0,
+     "rps": 146.9,
+     "fps": 0.0,
+     "p95": 7500.0
+    },
+    {
+     "t": 38,
+     "users": 500.0,
+     "rps": 140.8,
+     "fps": 0.0,
+     "p95": 7500.0
+    },
+    {
+     "t": 39,
+     "users": 500.0,
+     "rps": 138.3,
+     "fps": 0.0,
+     "p95": 7400.0
+    },
+    {
+     "t": 40,
+     "users": 500.0,
+     "rps": 144.4,
+     "fps": 0.0,
+     "p95": 7200.0
+    },
+    {
+     "t": 41,
+     "users": 500.0,
+     "rps": 148.2,
+     "fps": 0.0,
+     "p95": 6900.0
+    },
+    {
+     "t": 42,
+     "users": 500.0,
+     "rps": 160.4,
+     "fps": 0.0,
+     "p95": 6500.0
+    },
+    {
+     "t": 43,
+     "users": 500.0,
+     "rps": 180.7,
+     "fps": 0.0,
+     "p95": 5900.0
+    },
+    {
+     "t": 44,
+     "users": 500.0,
+     "rps": 186.2,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 45,
+     "users": 500.0,
+     "rps": 178.4,
+     "fps": 0.0,
+     "p95": 5400.0
+    },
+    {
+     "t": 46,
+     "users": 500.0,
+     "rps": 163.7,
+     "fps": 0.0,
+     "p95": 5500.0
+    },
+    {
+     "t": 47,
+     "users": 500.0,
+     "rps": 173.1,
+     "fps": 0.0,
+     "p95": 5600.0
+    },
+    {
+     "t": 48,
+     "users": 500.0,
+     "rps": 174.1,
+     "fps": 0.0,
+     "p95": 5700.0
+    },
+    {
+     "t": 49,
+     "users": 500.0,
+     "rps": 188.2,
+     "fps": 0.0,
+     "p95": 5400.0
+    },
+    {
+     "t": 50,
+     "users": 500.0,
+     "rps": 201.4,
+     "fps": 0.0,
+     "p95": 5400.0
+    },
+    {
+     "t": 51,
+     "users": 500.0,
+     "rps": 199.3,
+     "fps": 0.0,
+     "p95": 5300.0
+    },
+    {
+     "t": 52,
+     "users": 500.0,
+     "rps": 199.3,
+     "fps": 0.0,
+     "p95": 5200.0
+    },
+    {
+     "t": 53,
+     "users": 500.0,
+     "rps": 181.0,
+     "fps": 0.0,
+     "p95": 5200.0
+    },
+    {
+     "t": 54,
+     "users": 500.0,
+     "rps": 189.1,
+     "fps": 0.0,
+     "p95": 5200.0
+    },
+    {
+     "t": 55,
+     "users": 500.0,
+     "rps": 203.4,
+     "fps": 0.0,
+     "p95": 5100.0
+    }
+   ],
+   "server": {
+    "forwarded": 2257.0,
+    "rate_limited": {},
+    "upstream_errors": 177.0,
+    "gateway_ms": {
+     "p50": 1342.69,
+     "p95": 7784.15,
+     "p99": 9986.1,
+     "count": 2257,
+     "mean": 2102.67
+    },
+    "upstream_payment_ms": {
+     "p50": 407.61,
+     "p95": 1496.77,
+     "p99": 2272.0,
+     "count": 728,
+     "mean": 543.22
+    },
+    "upstream_account_ms": {
+     "p50": 2041.67,
+     "p95": 8638.75,
+     "p99": 10000.0,
+     "count": 1529,
+     "mean": 2756.48
+    },
+    "payment_service_ms": {
+     "p50": 55.42,
+     "p95": 184.68,
+     "p99": 343.7,
+     "count": 2963,
+     "mean": 66.32
+    },
+    "account_service_ms": {
+     "p50": 6.44,
+     "p95": 46.9,
+     "p99": 380.46,
+     "count": 6377,
+     "mean": 21.12
+    },
+    "db_query_ms": {
+     "p50": 7.42,
+     "p95": 69.31,
+     "p99": 819.58,
+     "count": 2532,
+     "mean": 31.53
+    },
+    "db_queries": 5716.0,
+    "cache_hit_ratio": 66.2,
+    "cache_hits": 7446,
+    "cache_misses": 3805,
+    "payments_created": 1911.0,
+    "payments_success": 1901.0,
+    "payments_failed": 10.0,
+    "settle_per_s": 29.5,
+    "queue_wait_ms": {
+     "p50": 3.8,
+     "p95": 404.87,
+     "p99": 966.06,
+     "count": 1911,
+     "mean": 53.86
+    },
+    "processing_ms": {
+     "p50": 140.97,
+     "p95": 399.86,
+     "p99": 1263.0,
+     "count": 1911,
+     "mean": 184.68
+    },
+    "bank_call_ms": {
+     "p50": 59.1,
+     "p95": 97.33,
+     "p99": 358.88,
+     "count": 1929,
+     "mean": 66.62
+    },
+    "txn_e2e_ms": {
+     "p50": 119.15,
+     "p95": 860.42,
+     "p99": 1423.01,
+     "count": 1901,
+     "mean": 197.56
+    },
+    "queue_pending_max": 16,
+    "queue_lag_max": 6
+   },
+   "timeline": [
+    {
+     "t": 0.0,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 3687.0
+    },
+    {
+     "t": 2.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 3687.0
+    },
+    {
+     "t": 4.1,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 0.0,
+     "payments_success": 3687.0
+    },
+    {
+     "t": 8.2,
+     "queue_pending": 16,
+     "queue_lag": 6,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 38.0,
+     "payments_success": 3706.0
+    },
+    {
+     "t": 12.5,
+     "queue_pending": 14,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 193.0,
+     "payments_success": 3880.0
+    },
+    {
+     "t": 19.1,
+     "queue_pending": 6,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 429.0,
+     "payments_success": 3987.0
+    },
+    {
+     "t": 31.0,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 903.0,
+     "payments_success": 4425.0
+    },
+    {
+     "t": 34.7,
+     "queue_pending": 10,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 1034.0,
+     "payments_success": 4585.0
+    },
+    {
+     "t": 39.6,
+     "queue_pending": 6,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 1305.0,
+     "payments_success": 4659.0
+    },
+    {
+     "t": 45.5,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 1476.0,
+     "payments_success": 4821.0
+    },
+    {
+     "t": 59.0,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2153.0,
+     "payments_success": 5260.0
+    },
+    {
+     "t": 62.2,
+     "queue_pending": 5,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2314.0,
+     "payments_success": 5515.0
+    },
+    {
+     "t": 64.2,
+     "queue_pending": 3,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2434.0,
+     "payments_success": 5588.0
+    },
+    {
+     "t": 66.3,
+     "queue_pending": 0,
+     "queue_lag": 0,
+     "gw_rate_limited": 0.0,
+     "gw_requests": 2434.0,
+     "payments_success": 5588.0
+    }
+   ],
+   "resources": {
+    "account-service": {
+     "cpu_mean": 61.7,
+     "cpu_max": 158.6,
+     "mem_max_mib": 68.8
+    },
+    "bank-mock": {
+     "cpu_mean": 26.8,
+     "cpu_max": 91.7,
+     "mem_max_mib": 52.0
+    },
+    "gateway": {
+     "cpu_mean": 294.5,
+     "cpu_max": 401.4,
+     "mem_max_mib": 246.1
+    },
+    "hotel-graphql-api": {
+     "cpu_mean": 0.7,
+     "cpu_max": 10.1,
+     "mem_max_mib": 33.9
+    },
+    "hotel-rest-api": {
+     "cpu_mean": 0.9,
+     "cpu_max": 12.7,
+     "mem_max_mib": 15.2
+    },
+    "lbdemo_backend1.1.361vdrdfi45n4v14y606ww2nc": {
+     "cpu_mean": 1.7,
+     "cpu_max": 8.9,
+     "mem_max_mib": 12.0
+    },
+    "lbdemo_backend2.1.78h3seumijesvty4pqhr9pt93": {
+     "cpu_mean": 1.7,
+     "cpu_max": 7.4,
+     "mem_max_mib": 10.8
+    },
+    "lbdemo_backend3.1.mhpy08mxi02bgwu6i8ubhkb8y": {
+     "cpu_mean": 1.4,
+     "cpu_max": 7.5,
+     "mem_max_mib": 9.1
+    },
+    "lbdemo_loadbalancer.1.zbhx28wvwvum111q8s5y16i6c": {
+     "cpu_mean": 1.1,
+     "cpu_max": 7.4,
+     "mem_max_mib": 10.4
+    },
+    "locust (load generator)": {
+     "cpu_mean": 46.7,
+     "cpu_max": 102.0,
+     "mem_max_mib": 58.9
+    },
+    "payment-service-1": {
+     "cpu_mean": 40.5,
+     "cpu_max": 114.6,
+     "mem_max_mib": 59.4
+    },
+    "payment-service-2": {
+     "cpu_mean": 30.9,
+     "cpu_max": 88.7,
+     "mem_max_mib": 66.0
+    },
+    "postgres": {
+     "cpu_mean": 89.0,
+     "cpu_max": 336.7,
+     "mem_max_mib": 208.9
+    },
+    "redis": {
+     "cpu_mean": 20.5,
+     "cpu_max": 30.6,
+     "mem_max_mib": 16.1
+    },
+    "restaurant-api": {
+     "cpu_mean": 0.3,
+     "cpu_max": 0.8,
+     "mem_max_mib": 51.5
+    },
+    "restaurant-mongodb": {
+     "cpu_mean": 2.9,
+     "cpu_max": 6.0,
+     "mem_max_mib": 200.2
+    },
+    "sdpractical4-mongos": {
+     "cpu_mean": 0.5,
+     "cpu_max": 1.9,
+     "mem_max_mib": 29.1
+    },
+    "worker-1": {
+     "cpu_mean": 57.0,
+     "cpu_max": 128.0,
+     "mem_max_mib": 60.4
+    },
+    "worker-2": {
+     "cpu_mean": 57.5,
+     "cpu_max": 144.1,
+     "mem_max_mib": 66.2
+    }
+   }
+  }
+ ],
+ "charts": [
+  "scale_throughput.png",
+  "scale_latency.png",
+  "scale_cpu.png",
+  "scale_rps_timeline.png",
+  "scale_queue.png",
+  "scale_stages.png"
+ ]
+}

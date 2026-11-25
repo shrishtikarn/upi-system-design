@@ -1,0 +1,147 @@
+[
+  {
+    "file": "screenshots/01_docker_ps.png",
+    "caption": "All containers of the cluster running and healthy before the test",
+    "section": "Setup"
+  },
+  {
+    "file": "screenshots/02_dashboard_before.png",
+    "caption": "Live dashboard before the test: every node UP, circuit breakers CLOSED",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/03_dashboard_p2p_load.png",
+    "caption": "Dashboard while 100 users send P2P payments: traffic flowing gateway -> payment nodes -> queue -> workers -> bank",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/04_dashboard_bank_down.png",
+    "caption": "Dashboard with the bank switch DOWN: worker circuit breakers OPEN, payments waiting in the queue",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/05_dashboard_recovered.png",
+    "caption": "Dashboard after the bank recovered: the deferred payments were re-delivered and settled",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/06_dashboard_after.png",
+    "caption": "Dashboard after the whole test run (totals, latest transactions)",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/07_dashboard_txn_journey.png",
+    "caption": "Dashboard: clicking a transaction shows its journey from the audit log",
+    "section": "Dashboard"
+  },
+  {
+    "file": "screenshots/08_pay_p2p_success.png",
+    "caption": "Pay console - P2P: Alice pays Bob Rs 150, payee verified, SUCCESS, balances move",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/09_pay_p2m_merchant.png",
+    "caption": "Pay console - P2M: Bob pays the merchant Chai Point",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/10_pay_bank_decline.png",
+    "caption": "Pay console - remitter bank declines (amount ending .13): FAILED, no money moves",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/11_pay_insufficient_funds.png",
+    "caption": "Pay console - payer cannot afford it: FAILED INSUFFICIENT_FUNDS",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/12_pay_over_limit.png",
+    "caption": "Pay console - Rs 1,50,000 is above the Rs 1 lakh P2P limit: rejected with 422",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/13_pay_self.png",
+    "caption": "Pay console - paying yourself is rejected (SAME_PAYER_PAYEE)",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/14_pay_unknown_payee.png",
+    "caption": "Pay console - unknown payee VPA: verification fails, 404",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/15_pay_double_tap.png",
+    "caption": "Pay console - double tap: the same Idempotency-Key twice, one debit",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/16_pay_bank_outage_recovered_waiting.png",
+    "caption": "Pay console - bank DOWN: the payment is accepted (202) and waits; the worker keeps retrying",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/17_pay_bank_outage_recovered.png",
+    "caption": "Pay console - payment sent while the bank was down finishes after the bank recovers",
+    "section": "Pay console"
+  },
+  {
+    "file": "screenshots/18_console_output.png",
+    "caption": "Console output of the 100-user scenario test",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/19_log_trace_p2p_transfer.png",
+    "caption": "Structured logs of one 'P2P transfer' request followed across every service (request_id d187a9390fb3496d)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/20_log_trace_p2m_merchant_payment.png",
+    "caption": "Structured logs of one 'P2M merchant payment' request followed across every service (request_id 67414d1e5dc14426)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/21_log_trace_double_tap_idempotent_replay.png",
+    "caption": "Structured logs of one 'Double tap (idempotent replay)' request followed across every service (request_id 1aeed662d2ca426c)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/22_log_trace_bank_decline.png",
+    "caption": "Structured logs of one 'Bank decline' request followed across every service (request_id 99a4a355d33d48c2)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/23_log_trace_insufficient_funds.png",
+    "caption": "Structured logs of one 'Insufficient funds' request followed across every service (request_id cb17ff60ea7e4a23)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/24_log_trace_bank_flaky_50_errors.png",
+    "caption": "Structured logs of one 'Bank flaky (50% errors)' request followed across every service (request_id 72c0cc906ae94548)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/25_log_trace_bank_down_then_recovers.png",
+    "caption": "Structured logs of one 'Bank down, then recovers' request followed across every service (request_id fd055e92f9234e6c)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/26_log_trace_amount_above_rs_1_lakh.png",
+    "caption": "Structured logs of one 'Amount above Rs 1 lakh' request followed across every service (request_id 6e03c1db09084d0e)",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/27_log_resilience.png",
+    "caption": "Retries with exponential backoff, circuit breaker OPEN / HALF_OPEN / CLOSED and deferred payments during the bank outage",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/28_log_rate_limited.png",
+    "caption": "Gateway log lines for requests rejected by the per-client token bucket",
+    "section": "Logs"
+  },
+  {
+    "file": "screenshots/29_log_payment_completed.png",
+    "caption": "Worker log lines for settled payments (SUCCESS / FAILED with reason)",
+    "section": "Logs"
+  }
+]

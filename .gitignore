@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+.DS_Store
+
+# load-test output (keep the folder and the 100/200/500-user summary + charts, not the raw data)
+loadtest/results/*
+!loadtest/results/.gitkeep
+!loadtest/results/scale/
+
+# intermediate HTML pages rendered only to take screenshots
+**/_render/
