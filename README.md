@@ -12,11 +12,6 @@ one `docker compose up`, and every request can be traced through every hop from 
 | Member 1 | **Darsh Shah** | **26MCE001** | https://github.com/darsh-1010 |
 | Member 2 | **Shrishti Karn** | **26MCE007** | https://github.com/shrishtikarn |
 
-**Submission files** (in [`submission/`](submission)): demonstration of every scenario
-([`26MCE001_26MCE007_UPI_Demonstration.pdf`](submission/26MCE001_26MCE007_UPI_Demonstration.pdf)),
-project + load-test report ([`26MCE001_26MCE007_UPI_Project_Report.pdf`](submission/26MCE001_26MCE007_UPI_Project_Report.pdf))
-and the presentation used in the demo ([`.pptx`](submission/26MCE001_26MCE007_UPI_Presentation.pptx) /
-[`.pdf`](submission/26MCE001_26MCE007_UPI_Presentation.pdf)).
 
 ![Architecture](docs/architecture.png)
 
