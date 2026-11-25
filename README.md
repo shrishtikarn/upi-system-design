@@ -328,10 +328,8 @@ The GitHub Actions workflow runs all of this, plus a short load test, on every p
 
 ## Team responsibilities (proposed split for the demo - edit to match who did what)
 
-| Member | Owns | Explains in the demo |
-|---|---|---|
-| Darsh Shah (26MCE001) | `gateway/` (pipeline, token bucket, health, dashboard, Pay Console), `docker-compose.yml`, diagrams, `common/resilience.py` | phase 1: routing, rate limiter, health checks; phase 3: circuit breaker + retries |
-| Shrishti Karn (26MCE007) | `db/`, `payment_service/`, `account_service/`, `worker/`, `common/cache.py`, `loadtest/`, `scripts/`, `common/logs.py`, `common/metrics.py` | phase 2: schema, idempotency, cache-aside, queue + worker; phase 3: load test, tracing, report |
+
+| Shrishti Karn (26MCE007) | `db/`, `payment_service/`, `account_service/`, `worker/`, `common/cache.py`, `loadtest/`, `scripts/`, `common/logs.py`, `common/metrics.py` | phase 2: schema, idempotency, cache-aside, queue + worker; phase 3: load test, tracing, report  `gateway/` (pipeline, token bucket, health, dashboard, Pay Console), `docker-compose.yml`, diagrams, `common/resilience.py` | phase 1: routing, rate limiter, health checks; phase 3: circuit breaker + retries  |
 
 ## Simplifications compared with real UPI
 
