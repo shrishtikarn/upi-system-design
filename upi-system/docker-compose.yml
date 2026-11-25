@@ -1,0 +1,199 @@
+# UPI payment system - local cluster
+#
+#   docker compose up --build          start everything (gateway on http://localhost:8080)
+#   docker compose --profile loadtest up locust     + Locust web UI on http://localhost:8089
+#   docker compose down -v             stop and wipe data
+#
+# Only the gateway is meant to be public. Postgres (5432), Redis (6379) and the
+# bank mock's chaos API (8090) are published for inspection during the demo.
+
+name: upi-system
+
+x-app: &app
+  build: .
+  restart: unless-stopped
+  environment: &app-env
+    DATABASE_URL: postgresql://upi:upi_dev_password@postgres:5432/upi
+    REDIS_URL: redis://redis:6379/0
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  healthcheck: &app-healthcheck
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live', timeout=2)"]
+    interval: 5s
+    timeout: 3s
+    retries: 12
+    start_period: 10s
+
+x-service-deps: &service-deps
+  migrate:
+    condition: service_completed_successfully
+  redis:
+    condition: service_healthy
+
+services:
+  # ------------------------------------------------------------------ data tier
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: upi
+      POSTGRES_PASSWORD: upi_dev_password
+      POSTGRES_DB: upi
+    command: ["postgres", "-c", "max_connections=200", "-c", "shared_buffers=128MB"]
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U upi -d upi"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # AOF persistence so queued payments survive a Redis restart.
+    # volatile-lru: under memory pressure evict only keys that have a TTL
+    # (cache entries, rate-limit buckets) - never the payment stream.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-lru"]
+    ports: ["6379:6379"]
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["python", "-m", "db.migrate"]
+    environment:
+      <<: *app-env
+      SERVICE_NAME: migrate
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ------------------------------------------------------------------ services
+  payment-service-1:
+    <<: *app
+    command: ["uvicorn", "payment_service.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: &payment-env
+      <<: *app-env
+      SERVICE_NAME: payment-service
+      NODE_ID: payment-service-1
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+    depends_on: *service-deps
+
+  payment-service-2:
+    <<: *app
+    command: ["uvicorn", "payment_service.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment:
+      <<: *payment-env
+      NODE_ID: payment-service-2
+    depends_on: *service-deps
+
+  account-service:
+    <<: *app
+    command: ["uvicorn", "account_service.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment:
+      <<: *app-env
+      SERVICE_NAME: account-service
+      NODE_ID: account-service
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+    depends_on: *service-deps
+
+  bank-mock:
+    <<: *app
+    command: ["uvicorn", "bank_mock.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment:
+      <<: *app-env
+      SERVICE_NAME: bank-mock
+      NODE_ID: bank-mock
+      BANK_MODE: ${BANK_MODE:-normal}
+    ports: ["8090:8000"]   # chaos control for the demo: POST http://localhost:8090/admin/chaos
+
+  # ------------------------------------------------------------------ async workers
+  worker-1:
+    <<: *app
+    command: ["uvicorn", "worker.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: &worker-env
+      <<: *app-env
+      SERVICE_NAME: worker
+      NODE_ID: worker-1
+      BANK_URL: http://bank-mock:8000
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-8}
+      BANK_TIMEOUT_S: "1.0"
+      BANK_RETRIES: "3"
+      BACKOFF_BASE_S: "0.2"
+      BACKOFF_MAX_S: "2.0"
+      CB_FAILURE_THRESHOLD: "5"
+      CB_RESET_TIMEOUT_S: "10"
+      MAX_DELIVERY_ATTEMPTS: "3"
+      RECLAIM_IDLE_MS: "15000"
+    depends_on:
+      <<: *service-deps
+      bank-mock:
+        condition: service_started
+
+  worker-2:
+    <<: *app
+    command: ["uvicorn", "worker.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment:
+      <<: *worker-env
+      NODE_ID: worker-2
+    depends_on:
+      <<: *service-deps
+      bank-mock:
+        condition: service_started
+
+  # ------------------------------------------------------------------ edge
+  gateway:
+    <<: *app
+    command: ["uvicorn", "gateway.main:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]
+    ports: ["8080:8080"]
+    environment:
+      <<: *app-env
+      SERVICE_NAME: gateway
+      NODE_ID: gateway
+      UPSTREAM_PAYMENT: http://payment-service-1:8000,http://payment-service-2:8000
+      UPSTREAM_ACCOUNT: http://account-service:8000
+      MONITOR_WORKER: http://worker-1:8000,http://worker-2:8000
+      MONITOR_BANK: http://bank-mock:8000
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RL_READ_CAPACITY: ${RL_READ_CAPACITY:-40}
+      RL_READ_REFILL_PER_S: ${RL_READ_REFILL_PER_S:-20}
+      RL_WRITE_CAPACITY: ${RL_WRITE_CAPACITY:-10}
+      RL_WRITE_REFILL_PER_S: ${RL_WRITE_REFILL_PER_S:-2}
+      RL_GLOBAL_CAPACITY: ${RL_GLOBAL_CAPACITY:-500}
+      RL_GLOBAL_REFILL_PER_S: ${RL_GLOBAL_REFILL_PER_S:-300}
+    healthcheck:
+      <<: *app-healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health/live', timeout=2)"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      payment-service-1:
+        condition: service_started
+      payment-service-2:
+        condition: service_started
+      account-service:
+        condition: service_started
+
+  # ------------------------------------------------------------------ load testing (opt-in)
+  locust:
+    image: locustio/locust:2.43.4
+    profiles: ["loadtest"]
+    user: "0:0"              # allows writing reports into the mounted ./loadtest/results
+    volumes: ["./loadtest:/mnt/locust"]
+    environment:
+      LOAD_SHAPE: ${LOAD_SHAPE:-}
+      SPIKE_USERS: ${SPIKE_USERS:-600}
+      BASE_USERS: ${BASE_USERS:-60}
+    command: ["-f", "/mnt/locust/locustfile.py", "--host", "http://gateway:8080"]
+    ports: ["8089:8089"]
+
+volumes:
+  pgdata:
+  redisdata:
